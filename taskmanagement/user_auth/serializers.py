@@ -10,3 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_password(self, value):
      password_validation.validate_password(value, self.instance)
      return value
+
+class SignInSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserModel
+        fields = ['email','password']
