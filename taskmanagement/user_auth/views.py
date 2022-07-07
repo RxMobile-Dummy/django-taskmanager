@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from .serializers import *
 from .models import *
+from django.http import JsonResponse
 
 # Create your views here.
 
@@ -35,6 +36,27 @@ def signup(request):
             userdetails[0].pop("is_active")
             userdetails[0].pop("is_delete")
             return Response({"successs" : True,"data" : userdetails[0],"message":"User created successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["POST"])
+def signin(request):
+    try:
+        data = request.data
+        serializer = SignInSerializer(data=data)
+        if serializer.is_valid():
+            password = serializer.data["password"]
+            email = serializer.data["email"]
+            user = UserModel.objects.filter(email=email,password=password).first()
+            if not user:
+                return Response({"successs" : False,"message":"Account does not exists, please register first"}, status=status.HTTP_201_CREATED)
+            userdata=list(UserModel.objects.values().filter(email=email))
+            userdata[0].pop("password")
+            userdata[0].pop("is_active")
+            userdata[0].pop("is_delete")
+            userdata[0].pop("user_id")
+            return JsonResponse({"successs" : True,"data" : userdata[0],"message":"User logged in successfully"}, safe=False)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
