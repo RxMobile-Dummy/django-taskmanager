@@ -1,0 +1,15 @@
+__pycache__/*
+user_auth/__pycache__/*
+user_auth/migrations/*
+comments/__pycache__/*
+comments/migrations/*
+notes/migrations/*
+notes/__pycache__/*
+projects/migrations/*
+projects/__pycache__/*
+tasks/migrations/*
+tasks/__pycache__/*
+taskmanagement/__pycache__/*
+tags/migrations/*
+tags/__pycache__/*
+
