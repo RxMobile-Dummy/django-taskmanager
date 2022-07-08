@@ -1,15 +1,23 @@
-from django.http import JsonResponse
-from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from .serializers import *
 from .models import ProjectModel
 from user_auth.models import *
-from django.db.models import Value
-from django.db.models.functions import Concat
+from taskmanagement.email_manager import EmailManager
+#importing loading from django template  
+from django.template import loader  
+# Create your views here.  
+from django.http import HttpResponse  
 # Create your views here.
 
+@api_view(["GET"])
+def index(request,project_id,assignee_id):
+   projectassignees = ProjectAssigneeModel.objects.create(project_id=project_id,
+   assignee_ids=assignee_id)
+   projectassignees.save()
+   template = loader.get_template('content.html') # getting our template  
+   return HttpResponse(template.render())  
 
 @api_view(["POST"])
 def addnewproject(request):
@@ -249,7 +257,7 @@ def deleteProjectstatus(request):
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@api_view(["POST"])
+@api_view(["GET"])
 def addprojectassignee(request):
     try:
         data = request.data
@@ -280,8 +288,7 @@ def addprojectassignee(request):
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
+        
 
 @api_view(["POST"])
 def deleteprojectassignee(request):
@@ -328,6 +335,37 @@ def getprojectassignees(request):
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(["POST"])
+def inviteprojectassignees(request):
+    try:
+        data = request.data
+        serializer = InviteProjectAssigneeSerializer(data=data)
+        if serializer.is_valid():
+            project_id = serializer.data["project_id"]
+            assignee_ids = data["assignee_ids"]
+            user_id = data["user_id"]
+            projectdata = ProjectModel.objects.filter(id=project_id).first()    
+            userdata = UserModel.objects.filter(id=user_id).first() 
+            if not userdata:
+                return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            if not projectdata:
+                return Response({"successs" : False,"message":"Project does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            if(len(assignee_ids)!=0):
+                for i in range(0,len(assignee_ids)):
+                    user = UserModel.objects.filter(id=int(assignee_ids[i])).first()
+                    if not user:
+                         return Response({"successs" : False,"message":f"Assignee with {assignee_ids[i]} does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            for i in range(0,len(assignee_ids)):
+                existingprojectassigneedata = ProjectAssigneeModel.objects.values().filter(project_id=project_id,assignee_ids=assignee_ids[i])
+                if existingprojectassigneedata:
+                     return Response({"successs" : False,"message":f"Assignee with {assignee_ids[i]} already exists in this project"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                assigneedata = UserModel.objects.filter(id=assignee_ids[i]).first() 
+                if assigneedata:
+                    return Response(EmailManager().sendEmail(assigneedata.email,"Forgot Password","",project_id,assigneedata.id), status=status.HTTP_200_OK)
+        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

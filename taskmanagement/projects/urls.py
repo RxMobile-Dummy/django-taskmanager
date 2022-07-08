@@ -12,7 +12,9 @@ urlpatterns = [
 	path('getprojectstatus/', views.getprojectstatus, name="getprojectstatus"),
 	path('updateprojectstatus/', views.updateprojectstatus, name="updateprojectstatus"),
 	path('deleteprojectstatus/', views.deleteProjectstatus, name="deleteprojectstatus"),
-	path('addprojectassignee/', views.addprojectassignee, name="addprojectassignee"),
+	path("addprojectassignee/", views.addprojectassignee, name="addprojectassignee"),
 	path('deleteprojectassignee/', views.deleteprojectassignee, name="deleteprojectassignee"),
-	path('getprojectassignees/', views.getprojectassignees, name="getprojectassignees"),	
+	path('getprojectassignees/', views.getprojectassignees, name="getprojectassignees"),
+	path('inviteprojectassignees/', views.inviteprojectassignees, name="inviteprojectassignees"),
+	path('index/<int:project_id>/<int:assignee_id>/', views.index, name='myname')
 ]

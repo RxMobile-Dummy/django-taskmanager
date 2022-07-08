@@ -66,4 +66,7 @@ class GetProjectAssigneeSerializer(serializers.ModelSerializer):
         exclude = ["assignee_ids"]
 
 
-
+class InviteProjectAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssigneeModel
+        exclude = ["assignee_ids"]
