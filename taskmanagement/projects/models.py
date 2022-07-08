@@ -23,3 +23,12 @@ class ProjectStatusModel(models.Model):
     updated_at = models.DateTimeField(default=datetime.now(), blank=True)
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
+
+
+class ProjectAssigneeModel(models.Model):
+    project_id = models.CharField(max_length=50)
+    assignee_ids = models.CharField(max_length=50)
+    created_at = models.DateTimeField(default=datetime.now(), blank=True)
+    updated_at = models.DateTimeField(default=datetime.now(), blank=True)
+    is_active = models.BooleanField(default=True)
+    is_delete = models.BooleanField(default=False)
