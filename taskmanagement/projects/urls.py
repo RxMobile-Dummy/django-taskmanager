@@ -11,5 +11,8 @@ urlpatterns = [
 	path('addprojectstatus/', views.addprojectstatus, name="addprojectstatus"),
 	path('getprojectstatus/', views.getprojectstatus, name="getprojectstatus"),
 	path('updateprojectstatus/', views.updateprojectstatus, name="updateprojectstatus"),
-	path('deleteprojectstatus/', views.deleteProjectstatus, name="deleteprojectstatus")
+	path('deleteprojectstatus/', views.deleteProjectstatus, name="deleteprojectstatus"),
+	path('addprojectassignee/', views.addprojectassignee, name="addprojectassignee"),
+	path('deleteprojectassignee/', views.deleteprojectassignee, name="deleteprojectassignee"),
+	path('getprojectassignees/', views.getprojectassignees, name="getprojectassignees"),	
 ]

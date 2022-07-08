@@ -49,6 +49,21 @@ class DeleteProjectStatusSerializer(serializers.ModelSerializer):
         model = ProjectStatusModel
         exclude = ["project_status"]
 
+class AddProjectAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssigneeModel
+        exclude = ["assignee_ids"]
+
+class DeleteProjectAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssigneeModel
+        exclude = ["assignee_ids"]
+
+
+class GetProjectAssigneeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectAssigneeModel
+        exclude = ["assignee_ids"]
 
 
 

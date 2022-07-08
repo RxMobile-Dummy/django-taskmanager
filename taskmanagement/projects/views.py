@@ -249,5 +249,85 @@ def deleteProjectstatus(request):
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@api_view(["POST"])
+def addprojectassignee(request):
+    try:
+        data = request.data
+        serializer = AddProjectAssigneeSerializer(data=data)
+        if serializer.is_valid():
+            project_id = serializer.data["project_id"]
+            assignee_ids = data["assignee_ids"]
+            projectdata = ProjectModel.objects.filter(id=project_id).first()    
+            if not projectdata:
+                return Response({"successs" : False,"message":"Project does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            if(len(assignee_ids)!=0):
+                for i in range(0,len(assignee_ids)):
+                    user = UserModel.objects.filter(id=int(assignee_ids[i])).first()
+                    if not user:
+                         return Response({"successs" : False,"message":f"Assignee with {assignee_ids[i]} does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+            for i in range(0,len(assignee_ids)):
+                 existingprojectassigneedata = list(ProjectAssigneeModel.objects.values().filter(project_id=project_id,assignee_ids=assignee_ids[i]))
+                 if existingprojectassigneedata:
+                     return Response({"successs" : False,"message":f"Assignee with {assignee_ids[i]} already exists in this project"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                 projectassignees = ProjectAssigneeModel.objects.create(project_id=project_id,
+            assignee_ids=assignee_ids[i])
+                 projectassignees.save()
+            projectassigneesdata=list(ProjectAssigneeModel.objects.values().filter(project_id=projectassignees.project_id))
+            projectassigneesdata[0].pop("is_active")
+            projectassigneesdata[0].pop("is_delete")
+            return Response({"successs" : True,"data" : projectassigneesdata,"message":"Project assignees added successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+@api_view(["POST"])
+def deleteprojectassignee(request):
+    try:
+        data = request.data
+        serializer = DeleteProjectAssigneeSerializer(data=data)
+        if serializer.is_valid():
+            project_id = serializer.data["project_id"]
+            assignee_ids = data["assignee_ids"]
+            projectdata = ProjectModel.objects.filter(id=project_id).first()    
+            if not projectdata:
+                return Response({"successs" : False,"message":"Project does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            if(len(assignee_ids)!=0):
+                for i in range(0,len(assignee_ids)):
+                    user = UserModel.objects.filter(id=int(assignee_ids[i])).first()
+                    if not user:
+                         return Response({"successs" : False,"message":f"Assignee with {assignee_ids[i]} does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                    ProjectAssigneeModel.objects.filter(assignee_ids=assignee_ids[i]).delete()
+            
+            return Response({"successs" : True,"message":"assignees deleted successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(["POST"])
+def getprojectassignees(request):
+    try:
+        data = request.data
+        serializer = GetProjectAssigneeSerializer(data=data)
+        if serializer.is_valid():
+            project_id = serializer.data["project_id"]
+            projectdata = list(ProjectModel.objects.values().filter(id=project_id))
+            if not projectdata:
+                return Response({"successs" : False,"message":"Project does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            projectassigneedata = list(ProjectAssigneeModel.objects.values().filter(project_id=project_id))
+            if (len(projectassigneedata) == 0):
+                return Response({"successs" : True,"data" : [],"message":"No project assignee found"}, status=status.HTTP_201_CREATED)
+            for i in range(0,len(projectassigneedata)):
+                    projectassigneedata[i].pop("is_active")
+                    projectassigneedata[i].pop("is_delete")
+            return Response({"successs" : True,"data" : projectassigneedata,"message":"Project assignee details fetched successfully"}, status=status.HTTP_201_CREATED)
+        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 
