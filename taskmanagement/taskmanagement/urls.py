@@ -22,4 +22,5 @@ urlpatterns = [
     path('taskapp/', include("projects.urls")),
     path('taskapp/', include("tasks.urls")),
     path('taskapp/', include("notes.urls")),
+    path('taskapp/', include("comments.urls")),
 ]
