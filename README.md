@@ -1,2 +1,2 @@
-# task-management-django
-Task management API using Django framework
+# django-taskmanager
+A simple task/project management backend designed in Django
