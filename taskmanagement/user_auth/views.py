@@ -4,7 +4,8 @@ from rest_framework import status
 from .serializers import *
 from .models import *
 from django.http import JsonResponse
-
+import uuid
+from django.core.mail import EmailMessage  
 # Create your views here.
 
 
@@ -58,5 +59,42 @@ def signin(request):
             userdata[0].pop("user_id")
             return JsonResponse({"successs" : True,"data" : userdata[0],"message":"User logged in successfully"}, safe=False)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["POST"])
+def forgotpassword(request):
+    try:
+        data = request.data
+        serializer = ForgotPasswordSerializer(data=data)
+        if serializer.is_valid():
+            email = serializer.data["email"]
+            otp = uuid.uuid4()
+            mail_subject = 'Activation link has been sent to your email id'  
+            email = EmailMessage(  
+                        mail_subject, str(otp), to=[email]  
+            )  
+            emailSentID = email.send()
+            print(f"SendIT : {emailSentID}")
+            return Response({"message":"reset mail sent"}, status=status.HTTP_200_OK)
+        return Response({"error":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(["POST"])
+def resetpassword(request):
+    try:
+        data = request.data
+        serializer = ResetPasswordSerializer(data=data)
+        if serializer.is_valid():
+         userdata = UserModel.objects.filter(id=serializer.data["user_id"]).first()
+         if not userdata:
+            return Response({"success" : False,"message":"Account does not exists"}, status=status.HTTP_404_NOT_FOUND)
+         if(data["password"]!=""):
+          password_validation.validate_password(data["password"])
+          userdata.password = serializer.data["password"]
+          userdata.save()
+          return Response({"success" : True,"message":"Password changed successfully"}, status=status.HTTP_200_OK)
+        return Response({"error":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
