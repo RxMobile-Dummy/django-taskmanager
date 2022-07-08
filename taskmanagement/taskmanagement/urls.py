@@ -21,4 +21,5 @@ urlpatterns = [
     path('taskapp/', include("user_auth.urls")),
     path('taskapp/', include("projects.urls")),
     path('taskapp/', include("tasks.urls")),
+    path('taskapp/', include("notes.urls")),
 ]
