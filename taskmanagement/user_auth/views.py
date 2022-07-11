@@ -7,8 +7,9 @@ from django.http import JsonResponse
 import uuid
 from django.core.mail import EmailMessage  
 # Create your views here.
+from drf_yasg.utils import swagger_auto_schema
 
-
+@swagger_auto_schema(method='POST', request_body=UserSerializer)
 @api_view(["POST"])
 def signup(request):
     try:
@@ -18,12 +19,12 @@ def signup(request):
             first_name = serializer.data["first_name"]
             last_name = serializer.data["last_name"]
             email_id = serializer.data["email"]
-            password = data["password"]
+            password = serializer.data["password"]
             role = serializer.data["role"]
             mobile_number = serializer.data["mobile_number"]
-            user = UserModel.objects.filter(mobile_number=mobile_number).first()
+            user = UserModel.objects.filter(mobile_number=mobile_number,email=email_id).first()
             if user:
-                userdata=list(UserModel.objects.values().filter(email=email_id))
+                userdata=list(UserModel.objects.values().filter(mobile_number=mobile_number,email=email_id))
                 userdata[0].pop("password")
                 userdata[0].pop("is_active")
                 userdata[0].pop("is_delete")
@@ -32,8 +33,6 @@ def signup(request):
             new_user = UserModel.objects.create(first_name=first_name,last_name=last_name,email=email_id,mobile_number=mobile_number,password=password,role=role)
             new_user.save()
             userdetails =list(UserModel.objects.values().filter(id=new_user.id))
-            print("userdetails")
-            print(userdetails)
             userdetails[0].pop("is_active")
             userdetails[0].pop("is_delete")
             return Response({"successs" : True,"data" : userdetails[0],"message":"User created successfully"}, status=status.HTTP_201_CREATED)
@@ -90,8 +89,8 @@ def resetpassword(request):
          userdata = UserModel.objects.filter(id=serializer.data["user_id"]).first()
          if not userdata:
             return Response({"success" : False,"message":"Account does not exists"}, status=status.HTTP_404_NOT_FOUND)
-         if(data["password"]!=""):
-          password_validation.validate_password(data["password"])
+         if(serializer.data["password"]!=""):
+          password_validation.validate_password(serializer.data["password"])
           userdata.password = serializer.data["password"]
           userdata.save()
           return Response({"success" : True,"message":"Password changed successfully"}, status=status.HTTP_200_OK)
