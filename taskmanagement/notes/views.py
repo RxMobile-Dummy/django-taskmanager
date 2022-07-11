@@ -48,7 +48,7 @@ def updatenote(request):
         serializer = UpdateNoteSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            note_id = data["note_id"] if data["note_id"] !="" else 0
+            note_id = serializer.data["id"] if serializer.data["id"] !="" else 0
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             title = serializer.data["title"]
@@ -64,7 +64,7 @@ def updatenote(request):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["note_id"] != ""):
+            if(note_id != ""):
                notesdata = NotesModel.objects.filter(id=note_id).first()
                if not notesdata:
                 return Response({"successs" : False,"message":"Note id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -91,7 +91,7 @@ def deletenote(request):
         serializer = DeleteNoteSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            note_id = data["note_id"]
+            note_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             note = NotesModel.objects.filter(id=note_id,project_id=project_id,task_id=task_id).first()
@@ -113,13 +113,13 @@ def getnote(request):
         serializer = GetNoteSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            note_id = data["note_id"] if data["note_id"] !="" else 0
+            note_id = serializer.data["id"] if data["id"] !="" else 0
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["note_id"] != ""):
+            if(note_id != ""):
                notedata = NotesModel.objects.filter(id=note_id).first()
                if not notedata:
                 return Response({"successs" : False,"message":"Note id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
