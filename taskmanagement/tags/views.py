@@ -42,18 +42,18 @@ def updatetag(request):
             user_id = serializer.data["user_id"]
             task_id = serializer.data["task_id"]
             name = serializer.data["name"]
-            tag_id = data["tag_id"]
+            tag_id = serializer.data["id"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             tag = TagModel.objects.filter(id=tag_id).first()
-            if not tag and data["tag_id"] != "":
+            if not tag and tag_id != "":
                 return Response({"successs" : False,"message":"Tag does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if(task_id != ""):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["tag_id"] != ""):
+            if(tag_id != ""):
                tagdata = TagModel.objects.filter(id=tag_id).first()
                if not tagdata:
                 return Response({"successs" : False,"message":"Tag id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -81,7 +81,7 @@ def deletetag(request):
         serializer = DeleteTagSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            tag_id = data["tag_id"]
+            tag_id = serializer.data["id"]
             tag = TagModel.objects.filter(id=tag_id,user_id=user_id).first()
             if not UserModel.objects.filter(id=user_id).first():
                 return Response({"successs" : False,"message":"Account does not exists"}, status=status.HTTP_201_CREATED)
@@ -101,12 +101,12 @@ def gettags(request):
         serializer = GetTagSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            tag_id = data["tag_id"] if data["tag_id"] !="" else 0
+            tag_id = serializer.data["id"] if serializer.data["id"] !="" else 0
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["tag_id"] != ""):
+            if(tag_id != ""):
                tagdata = TagModel.objects.filter(id=tag_id,task_id=task_id,user_id=user_id).first()
                if not tagdata:
                 return Response({"successs" : False,"message":"Tag does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
