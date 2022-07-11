@@ -1,4 +1,5 @@
 from dataclasses import fields
+from email.policy import default
 from rest_framework import serializers
 from .models import *
 
@@ -23,7 +24,7 @@ class DeleteTagSerializer(serializers.ModelSerializer):
         fields = ['user_id','id']
 
 class GetTagSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(default=None)
     class Meta:
         model = TagModel
         fields = ['user_id','task_id','id']

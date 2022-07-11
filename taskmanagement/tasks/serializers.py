@@ -1,4 +1,4 @@
-from dataclasses import fields
+from email.policy import default
 from rest_framework import serializers
 from .models import *
 
@@ -6,7 +6,7 @@ from .models import *
 class AddTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskModel
-        exclude = ["created_at","updated_at","is_active","is_delete"]
+        exclude = ["created_at","updated_at","is_active","is_delete","task_status"]
 
 
 class UpdateTaskSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class DeleteTaskSerializer(serializers.ModelSerializer):
 
 
 class GetTaskSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(default=None)
     class Meta:
         model = TaskModel
         fields = ['user_id','project_id','id']
@@ -37,7 +37,7 @@ class AddTaskStatusSerializer(serializers.ModelSerializer):
 
 
 class GetTaskStatusSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(default=None)
     class Meta:
         model = TaskStatusModel
         exclude = ["task_status","created_at","updated_at","is_active","is_delete"]

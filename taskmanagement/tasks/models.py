@@ -9,7 +9,7 @@ class TaskModel(models.Model):
     name = models.CharField(max_length=50)
     comment = models.CharField(max_length=50,blank=True,default="")
     description = models.CharField(max_length=300,default="",blank=True)
-    task_status = models.CharField(max_length = 200,blank=True,default="Pending")
+    task_status = models.CharField(max_length = 200,blank=True,default="")
     priority = models.CharField(max_length = 200)
     created_at = models.DateTimeField(default=datetime.now(), blank=True)
     updated_at = models.DateTimeField(default=datetime.now(), blank=True)

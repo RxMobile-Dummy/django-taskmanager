@@ -1,4 +1,5 @@
 from dataclasses import fields
+from email.policy import default
 from rest_framework import serializers
 
 from .models import *
@@ -7,7 +8,7 @@ from .models import *
 class AddProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectModel
-        exclude = ["created_at","updated_at","is_active","is_delete"]
+        exclude = ["created_at","updated_at","is_active","is_delete","status_id"]
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
@@ -17,7 +18,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
 
 
 class GetProjectSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(default=None)
     class Meta:
         model = ProjectModel
         fields = ['user_id','id']
@@ -37,7 +38,7 @@ class AddProjectStatusSerializer(serializers.ModelSerializer):
 
 
 class GetProjectStatusSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(default=None)
     class Meta:
         model = ProjectStatusModel
         exclude = ["project_status","created_at","updated_at","is_active","is_delete"]

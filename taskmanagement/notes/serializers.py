@@ -1,4 +1,5 @@
 from dataclasses import fields
+from email.policy import default
 from rest_framework import serializers
 from .models import *
 
@@ -24,7 +25,7 @@ class DeleteNoteSerializer(serializers.ModelSerializer):
 
 
 class GetNoteSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
+    id = serializers.IntegerField(default=None)
     class Meta:
         model = NotesModel
         fields = ['user_id','project_id','task_id','id']

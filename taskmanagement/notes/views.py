@@ -50,7 +50,7 @@ def updatenote(request):
         serializer = UpdateNoteSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            note_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            note_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             title = serializer.data["title"]
@@ -66,11 +66,10 @@ def updatenote(request):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(note_id != ""):
-               notesdata = NotesModel.objects.filter(id=note_id).first()
-               if not notesdata:
+            notesdata = NotesModel.objects.filter(id=note_id).first()
+            if not notesdata:
                 return Response({"successs" : False,"message":"Note id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-               else:
+            else:
                    note = NotesModel.objects.filter(id=note_id).first()
                    note.title = title
                    note.description = description
@@ -79,8 +78,6 @@ def updatenote(request):
                    notedata[0].pop("is_active")
                    notedata[0].pop("is_delete")
                    return Response({"successs" : True,"data" : notedata[0],"message":"Note details updated successfully"}, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"successs" : False,"message":"Note id param cannot be empty"}, status=status.HTTP_406_NOT_ACCEPTABLE)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -117,27 +114,32 @@ def getnote(request):
         serializer = GetNoteSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            note_id = serializer.data["id"] if data["id"] !="" else 0
+            note_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(note_id != ""):
-               notedata = NotesModel.objects.filter(id=note_id).first()
-               if not notedata:
-                return Response({"successs" : False,"message":"Note id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-               else:
-                notedata=list(NotesModel.objects.values().filter(id=note_id,project_id=project_id,task_id=task_id))
-                notedata[0].pop("is_active")
-                notedata[0].pop("is_delete")
-                return Response({"successs" : True,"data" : notedata,"message":"Note details fetched successfully"}, status=status.HTTP_201_CREATED)
-            else:
+            if (note_id ==None):
                 notedata=list(NotesModel.objects.values().filter(project_id=project_id,task_id=task_id))
+                if not notedata:
+                 return Response({"successs" : False,"message":"No note found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                if(len(notedata)==1):
+                    notedata[0].pop("is_active")
+                    notedata[0].pop("is_delete")
+                    return Response({"successs" : True,"data" : notedata[0],"message":"Note details fetched successfully"}, status=status.HTTP_201_CREATED)
                 for i in range(0,len(notedata)):
                     notedata[i].pop("is_active")
                     notedata[i].pop("is_delete")
                 return Response({"successs" : True,"data" : notedata,"message":"Note details fetched successfully"}, status=status.HTTP_201_CREATED)
+            notedata = NotesModel.objects.filter(id=note_id).first()
+            if not notedata:
+                return Response({"successs" : False,"message":"Note id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            else:
+                notedata=list(NotesModel.objects.values().filter(id=note_id,project_id=project_id,task_id=task_id))
+                notedata[0].pop("is_active")
+                notedata[0].pop("is_delete")
+                return Response({"successs" : True,"data" : notedata[0],"message":"Note details fetched successfully"}, status=status.HTTP_201_CREATED)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

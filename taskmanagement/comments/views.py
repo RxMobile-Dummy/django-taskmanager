@@ -57,7 +57,7 @@ def updatecomment(request):
         serializer = UpdateCommentSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            comment_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            comment_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             description = serializer.data["description"]
@@ -65,7 +65,7 @@ def updatecomment(request):
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             comment = CommentModel.objects.filter(id=comment_id).first()
-            if not comment and comment_id != "":
+            if not comment:
                 return Response({"successs" : False,"message":"Comment does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if(project_id != ""):
                projectdata = ProjectModel.objects.filter(id=project_id).first()
@@ -75,19 +75,16 @@ def updatecomment(request):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(comment_id != ""):
-               commentdata = CommentModel.objects.filter(id=comment_id).first()
-               if not commentdata:
+            commentdata = CommentModel.objects.filter(id=comment_id).first()
+            if not commentdata:
                 return Response({"successs" : False,"message":"Comment id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-               else:
+            else:
                    commentdata.description = description
                    commentdata.save()
                    comments = list(CommentModel.objects.values().filter(id=commentdata.id))
                    comments[0].pop("is_active")
                    comments[0].pop("is_delete")
                    return Response({"successs" : True,"data" : comments[0],"message":"Comment updated successfully"}, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"successs" : False,"message":"Comment id param cannot be empty"}, status=status.HTTP_406_NOT_ACCEPTABLE)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -126,7 +123,7 @@ def getcomments(request):
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
             comment_user_id = serializer.data["comment_user_id"]
-            comment_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            comment_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
@@ -134,21 +131,26 @@ def getcomments(request):
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if(project_id == "" and task_id == ""):
                   return Response({"successs" : False,"message":"Project id and task id cannot be empty together"}, status=status.HTTP_406_NOT_ACCEPTABLE)  
-            if(comment_id != ""):
-               commentdata = CommentModel.objects.filter(id=comment_id,project_id=project_id,task_id=task_id,comment_user_id=comment_user_id).first()
-               if not commentdata:
-                return Response({"successs" : False,"message":"Comment does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-               else:
-                commentdata=list(CommentModel.objects.values().filter(id=comment_id,project_id=project_id,task_id=task_id,comment_user_id=comment_user_id))
-                commentdata[0].pop("is_active")
-                commentdata[0].pop("is_delete")
-                return Response({"successs" : True,"data" : commentdata[0],"message":"Comment details fetched successfully"}, status=status.HTTP_201_CREATED)
-            else:
+            if (comment_id == None):
                 commentdata=list(CommentModel.objects.values().filter(project_id=project_id,task_id=task_id,comment_user_id=comment_user_id))
+                if not commentdata:
+                 return Response({"successs" : False,"message":"No comments found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                if(len(commentdata)==1):
+                    commentdata[0].pop("is_active")
+                    commentdata[0].pop("is_delete")
+                    return Response({"successs" : True,"data" : commentdata[0],"message":"Comment details fetched successfully"}, status=status.HTTP_201_CREATED)
                 for i in range(0,len(commentdata)):
                     commentdata[i].pop("is_active")
                     commentdata[i].pop("is_delete")
                 return Response({"successs" : True,"data" : commentdata,"message":"Comment details fetched successfully"}, status=status.HTTP_201_CREATED)
+            commentdata = CommentModel.objects.filter(id=comment_id,project_id=project_id,task_id=task_id,comment_user_id=comment_user_id).first()
+            if not commentdata:
+                return Response({"successs" : False,"message":"Comment does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            else:
+                commentdata=list(CommentModel.objects.values().filter(id=comment_id,project_id=project_id,task_id=task_id,comment_user_id=comment_user_id))
+                commentdata[0].pop("is_active")
+                commentdata[0].pop("is_delete")
+                return Response({"successs" : True,"data" : commentdata[0],"message":"Comment details fetched successfully"}, status=status.HTTP_201_CREATED)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

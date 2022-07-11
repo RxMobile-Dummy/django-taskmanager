@@ -32,7 +32,6 @@ def addnewproject(request):
             user_id = serializer.data["user_id"]
             name = serializer.data["name"]
             color = serializer.data["color"]
-            project_status_id = serializer.data["status_id"] if serializer.data["status_id"]!="" else ""
             description = serializer.data["description"]
             is_private = serializer.data["is_private"]
             duration = serializer.data["duration"]
@@ -40,15 +39,17 @@ def addnewproject(request):
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            statusData = ProjectStatusModel.objects.filter(project_status="Pending").first()
+            status_id = ""
+            if statusData:
+                status_id = statusData.id
+            if not user:
+                return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             projectdata = ProjectModel.objects.filter(user_id=user_id,name=name).first()    
             if projectdata:
                 return Response({"successs" : False,"message":"Project with same name already exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if (serializer.data["status_id"] !=""):
-               projectstatusdata = ProjectStatusModel.objects.filter(id=project_status_id).first()    
-               if not projectstatusdata:
-                return Response({"successs" : False,"message":"Project status id does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             new_project = ProjectModel.objects.create(user_id=user_id,
-            name=name,color=color,status_id=project_status_id,description=description,is_private=is_private,archive=archive,duration=duration)
+            name=name,color=color,status_id=status_id,description=description,is_private=is_private,archive=archive,duration=duration)
             new_project.save()
             projectdata=list(ProjectModel.objects.values().filter(id=new_project.id))
             projectdata[0].pop("is_active")
@@ -67,13 +68,24 @@ def getproject(request):
         serializer = GetProjectSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            project_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            project_id = serializer.data["id"]
+            if(project_id == None):
+                projectdata = list(ProjectModel.objects.values().filter(user_id=user_id))
+                if not projectdata:
+                 return Response({"successs" : False,"message":"No projects found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                if(len(projectdata)==1):
+                    projectdata[0].pop("is_active")
+                    projectdata[0].pop("is_delete")
+                    return Response({"successs" : True,"data" : projectdata[0],"message":"Project details fetched successfully"}, status=status.HTTP_201_CREATED)
+                for i in range(0,len(projectdata)):
+                    projectdata[i].pop("is_active")
+                    projectdata[i].pop("is_delete")
+                    return Response({"successs" : True,"data" : projectdata,"message":"Project details fetched successfully"}, status=status.HTTP_201_CREATED)
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(project_id != ""):
-               projectdata = ProjectModel.objects.filter(id=project_id).first()
-               if not projectdata:
+            projectdata = ProjectModel.objects.filter(id=project_id).first()
+            if not projectdata:
                 return Response({"successs" : False,"message":"Project id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             projectdata=list(ProjectModel.objects.values().filter(id=project_id))
             projectdata[0].pop("is_active")
@@ -92,7 +104,7 @@ def updateproject(request):
         serializer = UpdateProjectSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            project_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            project_id = serializer.data["id"]
             name = serializer.data["name"]
             color = serializer.data["color"]
             project_status_id = serializer.data["status_id"] if serializer.data["status_id"]!="" else ""
@@ -103,9 +115,8 @@ def updateproject(request):
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(project_id != ""):
-               projectdata = ProjectModel.objects.filter(id=project_id).first()
-               if not projectdata:
+            projectdata = ProjectModel.objects.filter(id=project_id).first()
+            if not projectdata:
                 return Response({"successs" : False,"message":"Project id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if (serializer.data["status_id"]!=""):
                projectstatusdata = ProjectStatusModel.objects.filter(id=project_status_id).first()    
@@ -201,22 +212,27 @@ def getprojectstatus(request):
         data = request.data
         serializer = GetProjectStatusSerializer(data=data)
         if serializer.is_valid():
-            project_status_id = serializer.data["id"] if serializer.data["id"] !="" else 0
-            if(project_status_id != ""):
-               projectstatusdata = ProjectStatusModel.objects.filter(id=project_status_id).first()
-               if not projectstatusdata:
-                return Response({"successs" : False,"message":"Project status id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-               else:
-                projectstatusdata=list(ProjectStatusModel.objects.values().filter(id=project_status_id))
-                projectstatusdata[0].pop("is_active")
-                projectstatusdata[0].pop("is_delete")
-                return Response({"successs" : True,"data" : projectstatusdata,"message":"Project status details fetched successfully"}, status=status.HTTP_201_CREATED)
-            else:
+            project_status_id = serializer.data["id"]
+            if(project_status_id == None):
                 projectstatusdata=list(ProjectStatusModel.objects.values())
+                if not projectstatusdata:
+                 return Response({"successs" : False,"message":"No project status found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                if(len(projectstatusdata)==1):
+                    projectstatusdata[0].pop("is_active")
+                    projectstatusdata[0].pop("is_delete")
+                    return Response({"successs" : True,"data" : projectstatusdata[0],"message":"Project status details fetched successfully"}, status=status.HTTP_201_CREATED)
                 for i in range(0,len(projectstatusdata)):
                     projectstatusdata[i].pop("is_active")
                     projectstatusdata[i].pop("is_delete")
                 return Response({"successs" : True,"data" : projectstatusdata,"message":"Project status details fetched successfully"}, status=status.HTTP_201_CREATED)
+            projectstatusdata = ProjectStatusModel.objects.filter(id=project_status_id).first()
+            if not projectstatusdata:
+                return Response({"successs" : False,"message":"Project status id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            else:
+                projectstatusdata=list(ProjectStatusModel.objects.values().filter(id=project_status_id))
+                projectstatusdata[0].pop("is_active")
+                projectstatusdata[0].pop("is_delete")
+                return Response({"successs" : True,"data" : projectstatusdata[0],"message":"Project status details fetched successfully"}, status=status.HTTP_201_CREATED)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -257,7 +273,7 @@ def deleteProjectstatus(request):
         data = request.data
         serializer = DeleteProjectStatusSerializer(data=data)
         if serializer.is_valid():
-            project_status_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            project_status_id = serializer.data["id"]
             if not ProjectStatusModel.objects.filter(id=project_status_id).first():
                 return Response({"successs" : False,"message":"Project status id does not exists"}, status=status.HTTP_201_CREATED)
             ProjectStatusModel.objects.filter(id=project_status_id).delete()
@@ -344,6 +360,7 @@ def getprojectassignees(request):
             for i in range(0,len(projectassigneedata)):
                     projectassigneedata[i].pop("is_active")
                     projectassigneedata[i].pop("is_delete")
+                    projectassigneedata[i].pop("user_id")
             return Response({"successs" : True,"data" : projectassigneedata,"message":"Project assignee details fetched successfully"}, status=status.HTTP_201_CREATED)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -361,7 +378,7 @@ def inviteprojectassignees(request):
             assignee_ids = serializer.data["assignee_ids"]
             assignee_ids = str(assignee_ids).split(",")
             user_id = serializer.data["user_id"]
-            projectdata = ProjectModel.objects.filter(id=project_id).first()    
+            projectdata = ProjectModel.objects.filter(id=project_id,user_id=user_id).first()    
             userdata = UserModel.objects.filter(id=user_id).first() 
             if not userdata:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -369,6 +386,8 @@ def inviteprojectassignees(request):
                 return Response({"successs" : False,"message":"Project does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if(len(assignee_ids)!=0):
                 for i in range(0,len(assignee_ids)):
+                    if(user_id == assignee_ids[i]):
+                        return Response({"successs" : False,"message":f"User id and assignee id cannot be same"}, status=status.HTTP_406_NOT_ACCEPTABLE)
                     user = UserModel.objects.filter(id=int(assignee_ids[i])).first()
                     if not user:
                          return Response({"successs" : False,"message":f"Assignee with {assignee_ids[i]} does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
