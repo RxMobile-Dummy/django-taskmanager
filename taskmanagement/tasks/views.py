@@ -64,7 +64,7 @@ def updatetask(request):
         serializer = UpdateTaskSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            task_id = data["task_id"] if data["task_id"] !="" else 0
+            task_id = serializer.data["id"] if data["id"] !="" else 0
             project_id = serializer.data["project_id"]
             name = serializer.data["name"]
             comment = serializer.data["comment"]
@@ -84,7 +84,7 @@ def updatetask(request):
                projectdata = ProjectModel.objects.filter(id=project_id).first()
                if not projectdata:
                 return Response({"successs" : False,"message":"Project id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["task_id"] != ""):
+            if(task_id != ""):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -128,7 +128,7 @@ def deletetask(request):
         serializer = DeleteTaskSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            task_id = data["task_id"]
+            task_id = serializer.data["id"]
             task = TaskModel.objects.filter(id=task_id).first()
             if not UserModel.objects.filter(id=user_id).first():
                 return Response({"successs" : False,"message":"Account does not exists"}, status=status.HTTP_201_CREATED)
@@ -148,11 +148,11 @@ def gettask(request):
         serializer = GetTaskSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            task_id = data["task_id"] if data["task_id"] !="" else 0
+            task_id = serializer.data["id"] if data["id"] !="" else 0
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["task_id"] != ""):
+            if(task_id != ""):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -199,8 +199,8 @@ def gettaskstatus(request):
         data = request.data
         serializer = GetTaskStatusSerializer(data=data)
         if serializer.is_valid():
-            task_status_id = data["task_status_id"] if data["task_status_id"] !="" else 0
-            if(data["task_status_id"] != ""):
+            task_status_id = serializer.data["id"] if serializer.data["id"] !="" else 0
+            if(task_status_id != ""):
                taskstatusdata = TaskStatusModel.objects.filter(id=task_status_id).first()
                if not taskstatusdata:
                 return Response({"successs" : False,"message":"Task status id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -226,9 +226,9 @@ def updatetaskstatus(request):
         data = request.data
         serializer = UpdateTaskStatusSerializer(data=data)
         if serializer.is_valid():
-            task_status_id = data["task_status_id"]
+            task_status_id = serializer.data["id"]
             task_status = serializer.data["task_status"]
-            if(data["task_status_id"] != ""):
+            if(task_status_id != ""):
                taskstatusdata = TaskStatusModel.objects.filter(id=task_status_id).first()
                if not taskstatusdata:
                 return Response({"successs" : False,"message":"Task status id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -253,7 +253,7 @@ def deletetaskstatus(request):
         data = request.data
         serializer = DeleteTaskStatusSerializer(data=data)
         if serializer.is_valid():
-            task_status_id = data["task_status_id"] if data["task_status_id"] !="" else 0
+            task_status_id = serializer.data["id"] if serializer.data["id"] !="" else 0
             if not TaskStatusModel.objects.filter(id=task_status_id).first():
                 return Response({"successs" : False,"message":"Task status id does not exists"}, status=status.HTTP_201_CREATED)
             TaskStatusModel.objects.filter(id=task_status_id).delete()
