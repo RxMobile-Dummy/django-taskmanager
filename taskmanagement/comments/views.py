@@ -55,7 +55,7 @@ def updatecomment(request):
         serializer = UpdateCommentSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            comment_id = data["comment_id"] if data["comment_id"] !="" else 0
+            comment_id = serializer.data["id"] if serializer.data["id"] !="" else 0
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             description = serializer.data["description"]
@@ -63,7 +63,7 @@ def updatecomment(request):
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             comment = CommentModel.objects.filter(id=comment_id).first()
-            if not comment and data["comment_id"] != "":
+            if not comment and comment_id != "":
                 return Response({"successs" : False,"message":"Comment does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if(project_id != ""):
                projectdata = ProjectModel.objects.filter(id=project_id).first()
@@ -73,7 +73,7 @@ def updatecomment(request):
                taskdata = TaskModel.objects.filter(id=task_id).first()
                if not taskdata:
                 return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(data["comment_id"] != ""):
+            if(comment_id != ""):
                commentdata = CommentModel.objects.filter(id=comment_id).first()
                if not commentdata:
                 return Response({"successs" : False,"message":"Comment id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -98,8 +98,8 @@ def deletecomment(request):
         serializer = DeleteCommentSerializer(data=data)
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
-            comment_id = data["comment_id"]
-            comment_user_id = data["comment_user_id"]
+            comment_id = serializer.data["id"]
+            comment_user_id = serializer.data["comment_user_id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             comment = CommentModel.objects.filter(id=comment_id,project_id=project_id,task_id=task_id,comment_user_id=comment_user_id).first()
@@ -122,7 +122,7 @@ def getcomments(request):
         if serializer.is_valid():
             user_id = serializer.data["user_id"]
             comment_user_id = serializer.data["comment_user_id"]
-            comment_id = data["comment_id"] if data["comment_id"] !="" else 0
+            comment_id = serializer.data["id"] if serializer.data["id"] !="" else 0
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
@@ -130,7 +130,7 @@ def getcomments(request):
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if(project_id == "" and task_id == ""):
                   return Response({"successs" : False,"message":"Project id and task id cannot be empty together"}, status=status.HTTP_406_NOT_ACCEPTABLE)  
-            if(data["comment_id"] != ""):
+            if(comment_id != ""):
                commentdata = CommentModel.objects.filter(id=comment_id,project_id=project_id,task_id=task_id,comment_user_id=comment_user_id).first()
                if not commentdata:
                 return Response({"successs" : False,"message":"Comment does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
