@@ -18,3 +18,19 @@ class UserModel(models.Model):
     updated_at = models.DateTimeField(default=datetime.now(), blank=True)
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
+
+
+class UserRoleModel(models.Model):
+    user_role = models.CharField(max_length=40)
+    created_at = models.DateTimeField(default=datetime.now(), blank=True)
+    updated_at = models.DateTimeField(default=datetime.now(), blank=True)
+    is_active = models.BooleanField(default=True)
+    is_delete = models.BooleanField(default=False)
+
+
+class UserStatusModel(models.Model):
+    user_status = models.CharField(max_length=40)
+    created_at = models.DateTimeField(default=datetime.now(), blank=True)
+    updated_at = models.DateTimeField(default=datetime.now(), blank=True)
+    is_active = models.BooleanField(default=True)
+    is_delete = models.BooleanField(default=False)
