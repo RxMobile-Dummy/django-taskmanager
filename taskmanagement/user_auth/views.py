@@ -40,6 +40,7 @@ def signup(request):
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@swagger_auto_schema(method='POST', request_body=SignInSerializer)
 @api_view(["POST"])
 def signin(request):
     try:
@@ -61,6 +62,7 @@ def signin(request):
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@swagger_auto_schema(method='POST', request_body=ForgotPasswordSerializer)
 @api_view(["POST"])
 def forgotpassword(request):
     try:
@@ -80,6 +82,7 @@ def forgotpassword(request):
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@swagger_auto_schema(method='POST', request_body=ResetPasswordSerializer)
 @api_view(["POST"])
 def resetpassword(request):
     try:

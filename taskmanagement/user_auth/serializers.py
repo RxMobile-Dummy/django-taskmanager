@@ -14,14 +14,14 @@ class UserSerializer(serializers.ModelSerializer):
 class SignInSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['email','password',"created_at","updated_at","is_active","is_delete"]
+        fields = ['email','password']
 
 class ForgotPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['email',"created_at","updated_at","is_active","is_delete"]
+        fields = ['email']
 
 class ResetPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserModel
-        fields = ['email','password',"created_at","updated_at","is_active","is_delete"]
+        fields = ['email','password']

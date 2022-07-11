@@ -9,7 +9,9 @@ from taskmanagement.email_manager import EmailManager
 from django.template import loader  
 # Create your views here.  
 from django.http import HttpResponse  
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
+
 
 @api_view(["GET"])
 def index(request,project_id,assignee_id):
@@ -19,6 +21,8 @@ def index(request,project_id,assignee_id):
    template = loader.get_template('content.html') # getting our template  
    return HttpResponse(template.render())  
 
+
+@swagger_auto_schema(method='POST', request_body=AddProjectSerializer)
 @api_view(["POST"])
 def addnewproject(request):
     try:
@@ -55,6 +59,7 @@ def addnewproject(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetProjectSerializer)
 @api_view(["POST"])
 def getproject(request):
     try:
@@ -79,7 +84,7 @@ def getproject(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+@swagger_auto_schema(method='POST', request_body=UpdateProjectSerializer)
 @api_view(["POST"])
 def updateproject(request):
     try:
@@ -124,7 +129,7 @@ def updateproject(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+@swagger_auto_schema(method='POST', request_body=GetProjectSerializer)
 @api_view(["POST"])
 def getallprojects(request):
     try:
@@ -147,6 +152,7 @@ def getallprojects(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=DeleteProjectSerializer)
 @api_view(["POST"])
 def deleteproject(request):
     try:
@@ -166,7 +172,7 @@ def deleteproject(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+@swagger_auto_schema(method='POST', request_body=AddProjectStatusSerializer)
 @api_view(["POST"])
 def addprojectstatus(request):
     try:
@@ -188,6 +194,7 @@ def addprojectstatus(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetProjectStatusSerializer)
 @api_view(["POST"])
 def getprojectstatus(request):
     try:
@@ -215,6 +222,7 @@ def getprojectstatus(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=UpdateProjectStatusSerializer)
 @api_view(["POST"])
 def updateprojectstatus(request):
     try:
@@ -242,6 +250,7 @@ def updateprojectstatus(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=DeleteProjectStatusSerializer)
 @api_view(["POST"])
 def deleteProjectstatus(request):
     try:
@@ -256,6 +265,7 @@ def deleteProjectstatus(request):
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 @api_view(["GET"])
 def addprojectassignee(request):
@@ -291,6 +301,7 @@ def addprojectassignee(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 
+@swagger_auto_schema(method='POST', request_body=DeleteProjectAssigneeSerializer)
 @api_view(["POST"])
 def deleteprojectassignee(request):
     try:
@@ -316,6 +327,7 @@ def deleteprojectassignee(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetProjectAssigneeSerializer)
 @api_view(["POST"])
 def getprojectassignees(request):
     try:
@@ -338,6 +350,7 @@ def getprojectassignees(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=InviteProjectAssigneeSerializer)
 @api_view(["POST"])
 def inviteprojectassignees(request):
     try:

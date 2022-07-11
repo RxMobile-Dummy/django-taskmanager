@@ -4,9 +4,11 @@ from rest_framework import status
 from .serializers import *
 from projects.models import ProjectModel
 from user_auth.models import *
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
 
+@swagger_auto_schema(method='POST', request_body=AddTaskSerializer)
 @api_view(["POST"])
 def addnewtask(request):
     try:
@@ -56,7 +58,7 @@ def addnewtask(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+@swagger_auto_schema(method='POST', request_body=UpdateTaskSerializer)
 @api_view(["POST"])
 def updatetask(request):
     try:
@@ -120,7 +122,7 @@ def updatetask(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+@swagger_auto_schema(method='POST', request_body=DeleteTaskSerializer)
 @api_view(["POST"])
 def deletetask(request):
     try:
@@ -141,6 +143,7 @@ def deletetask(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetTaskSerializer)
 @api_view(["POST"])
 def gettask(request):
     try:
@@ -172,6 +175,7 @@ def gettask(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=AddTaskStatusSerializer)
 @api_view(["POST"])
 def addtaskstatus(request):
     try:
@@ -193,6 +197,7 @@ def addtaskstatus(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetTaskStatusSerializer)
 @api_view(["POST"])
 def gettaskstatus(request):
     try:
@@ -220,6 +225,7 @@ def gettaskstatus(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=UpdateTaskStatusSerializer)
 @api_view(["POST"])
 def updatetaskstatus(request):
     try:
@@ -247,6 +253,7 @@ def updatetaskstatus(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=DeleteTaskStatusSerializer)
 @api_view(["POST"])
 def deletetaskstatus(request):
     try:

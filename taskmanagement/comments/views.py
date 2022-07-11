@@ -5,9 +5,10 @@ from .serializers import *
 from projects.models import ProjectModel
 from tasks.models import TaskModel
 from user_auth.models import *
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
-
+@swagger_auto_schema(method='POST', request_body=AddCommentSerializer)
 @api_view(["POST"])
 def addnewcomment(request):
     try:
@@ -48,6 +49,7 @@ def addnewcomment(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=UpdateCommentSerializer)
 @api_view(["POST"])
 def updatecomment(request):
     try:
@@ -91,6 +93,7 @@ def updatecomment(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=DeleteCommentSerializer)
 @api_view(["POST"])
 def deletecomment(request):
     try:
@@ -114,6 +117,7 @@ def deletecomment(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetCommentSerializer)
 @api_view(["POST"])
 def getcomments(request):
     try:
