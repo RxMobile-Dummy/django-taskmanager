@@ -5,9 +5,10 @@ from .serializers import *
 from projects.models import ProjectModel
 from tasks.models import TaskModel
 from user_auth.models import *
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
-
+@swagger_auto_schema(method='POST', request_body=AddNoteSerializer)
 @api_view(["POST"])
 def addnewnote(request):
     try:
@@ -41,6 +42,7 @@ def addnewnote(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=UpdateNoteSerializer)
 @api_view(["POST"])
 def updatenote(request):
     try:
@@ -84,6 +86,7 @@ def updatenote(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=DeleteNoteSerializer)
 @api_view(["POST"])
 def deletenote(request):
     try:
@@ -106,6 +109,7 @@ def deletenote(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetNoteSerializer)
 @api_view(["POST"])
 def getnote(request):
     try:

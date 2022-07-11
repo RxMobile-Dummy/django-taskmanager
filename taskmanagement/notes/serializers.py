@@ -27,7 +27,7 @@ class GetNoteSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     class Meta:
         model = NotesModel
-        fields = ['user_id','project_id','task_id']
+        fields = ['user_id','project_id','task_id','id']
 
 
 

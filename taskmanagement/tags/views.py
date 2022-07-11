@@ -4,9 +4,10 @@ from rest_framework import status
 from .serializers import *
 from tasks.models import TaskModel
 from user_auth.models import *
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 
-
+@swagger_auto_schema(method='POST', request_body=AddTagSerializer)
 @api_view(["POST"])
 def addtag(request):
     try:
@@ -33,6 +34,7 @@ def addtag(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=UpdateTagSerializer)
 @api_view(["POST"])
 def updatetag(request):
     try:
@@ -73,7 +75,7 @@ def updatetag(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-
+@swagger_auto_schema(method='POST', request_body=DeleteTagSerializer)
 @api_view(["POST"])
 def deletetag(request):
     try:
@@ -94,6 +96,7 @@ def deletetag(request):
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(method='POST', request_body=GetTagSerializer)
 @api_view(["POST"])
 def gettags(request):
     try:
