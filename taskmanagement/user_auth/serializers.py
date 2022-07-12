@@ -1,15 +1,21 @@
 from rest_framework import serializers
+
+from jwt_utility import *
 from .models import *
 from django.contrib.auth import password_validation
 
 
 class UserSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = UserModel
         exclude = ["profile_pic","user_id","created_at","updated_at","is_active","is_delete","status_id"]
     def validate_password(self, value):
      password_validation.validate_password(value, self.instance)
      return value
+     
+    def get_token(self, user):
+        return JWTUtility.encode_token(user)
 
 
 class SignInSerializer(serializers.ModelSerializer):

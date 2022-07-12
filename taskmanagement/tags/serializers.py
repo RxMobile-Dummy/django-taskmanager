@@ -7,27 +7,27 @@ from .models import *
 class AddTagSerializer(serializers.ModelSerializer):
     class Meta:
         model = TagModel
-        exclude = ["created_at","updated_at","is_active","is_delete"]
+        exclude = ["created_at","updated_at","is_active","is_delete","user_id"]
 
 
 class UpdateTagSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     class Meta:
         model = TagModel
-        exclude = ["created_at","updated_at","is_active","is_delete"]
+        exclude = ["created_at","updated_at","is_active","is_delete","user_id"]
 
 
 class DeleteTagSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     class Meta:
         model = TagModel
-        fields = ['user_id','id']
+        fields = ['id']
 
 class GetTagSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(default=None)
     class Meta:
         model = TagModel
-        fields = ['user_id','task_id','id']
+        fields = ['task_id','id']
 
 
 

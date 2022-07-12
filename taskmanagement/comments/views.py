@@ -6,16 +6,18 @@ from projects.models import ProjectModel
 from tasks.models import TaskModel
 from user_auth.models import *
 from drf_yasg.utils import swagger_auto_schema
+from user_auth.authentication import Authentication
 # Create your views here.
 
 @swagger_auto_schema(method='POST', request_body=AddCommentSerializer)
 @api_view(["POST"])
 def addnewcomment(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddCommentSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             comment_user_id = serializer.data["comment_user_id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
@@ -53,10 +55,11 @@ def addnewcomment(request):
 @api_view(["POST"])
 def updatecomment(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = UpdateCommentSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
@@ -94,10 +97,11 @@ def updatecomment(request):
 @api_view(["POST"])
 def deletecomment(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = DeleteCommentSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
             comment_user_id = serializer.data["comment_user_id"]
             project_id = serializer.data["project_id"]
@@ -118,10 +122,11 @@ def deletecomment(request):
 @api_view(["POST"])
 def getcomments(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetCommentSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             comment_user_id = serializer.data["comment_user_id"]
             comment_id = serializer.data["id"]
             project_id = serializer.data["project_id"]

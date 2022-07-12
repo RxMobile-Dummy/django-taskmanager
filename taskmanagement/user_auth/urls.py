@@ -21,5 +21,4 @@ urlpatterns = [
 	path('updateuserstatus/',views.updateuserstatus,name="updateuserstatus"),
 	path('deleteuserstatus/',views.deleteuserstatus,name="deleteuserstatus"),
 	path('getuserstatus/',views.getuserstatus,name="getuserstatus"),
-
 ]

@@ -8,27 +8,27 @@ from .models import *
 class AddProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectModel
-        exclude = ["created_at","updated_at","is_active","is_delete","status_id"]
+        exclude = ["created_at","updated_at","is_active","is_delete","status_id","user_id"]
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     class Meta:
         model = ProjectModel
-        exclude = ["created_at","updated_at","is_active","is_delete"]
+        exclude = ["created_at","updated_at","is_active","is_delete","user_id"]
 
 
 class GetProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(default=None)
     class Meta:
         model = ProjectModel
-        fields = ['user_id','id']
+        fields = ['id']
 
 
 class DeleteProjectSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     class Meta:
         model = ProjectModel
-        fields = ['user_id','id']
+        fields = ['id']
 
 
 class AddProjectStatusSerializer(serializers.ModelSerializer):
@@ -77,4 +77,4 @@ class GetProjectAssigneeSerializer(serializers.ModelSerializer):
 class InviteProjectAssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectAssigneeModel
-        exclude = ["created_at","updated_at","is_active","is_delete"]
+        exclude = ["created_at","updated_at","is_active","is_delete","user_id"]

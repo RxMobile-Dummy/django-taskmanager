@@ -6,16 +6,18 @@ from projects.models import ProjectModel
 from tasks.models import TaskModel
 from user_auth.models import *
 from drf_yasg.utils import swagger_auto_schema
+from user_auth.authentication import Authentication
 # Create your views here.
 
 @swagger_auto_schema(method='POST', request_body=AddNoteSerializer)
 @api_view(["POST"])
 def addnewnote(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddNoteSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             title = serializer.data["title"]
@@ -46,10 +48,11 @@ def addnewnote(request):
 @api_view(["POST"])
 def updatenote(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = UpdateNoteSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             note_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
@@ -87,10 +90,11 @@ def updatenote(request):
 @api_view(["POST"])
 def deletenote(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = DeleteNoteSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             note_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
@@ -110,10 +114,11 @@ def deletenote(request):
 @api_view(["POST"])
 def getnote(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetNoteSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             note_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]

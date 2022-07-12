@@ -7,9 +7,9 @@ from user_auth.models import *
 from taskmanagement.email_manager import EmailManager
 #importing loading from django template  
 from django.template import loader  
-# Create your views here.  
 from django.http import HttpResponse  
 from drf_yasg.utils import swagger_auto_schema
+from user_auth.authentication import Authentication
 # Create your views here.
 
 
@@ -26,10 +26,11 @@ def index(request,project_id,assignee_id):
 @api_view(["POST"])
 def addnewproject(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddProjectSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             name = serializer.data["name"]
             color = serializer.data["color"]
             description = serializer.data["description"]
@@ -64,10 +65,11 @@ def addnewproject(request):
 @api_view(["POST"])
 def getproject(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetProjectSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             project_id = serializer.data["id"]
             if(project_id == None):
                 projectdata = list(ProjectModel.objects.values().filter(user_id=user_id))
@@ -100,10 +102,11 @@ def getproject(request):
 @api_view(["POST"])
 def updateproject(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = UpdateProjectSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             project_id = serializer.data["id"]
             name = serializer.data["name"]
             color = serializer.data["color"]
@@ -144,10 +147,11 @@ def updateproject(request):
 @api_view(["POST"])
 def getallprojects(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetProjectSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -167,10 +171,11 @@ def getallprojects(request):
 @api_view(["POST"])
 def deleteproject(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = DeleteProjectSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             project_id = serializer.data["id"]
             if not UserModel.objects.filter(id=user_id).first():
                 return Response({"successs" : False,"message":"Account does not exists"}, status=status.HTTP_201_CREATED)
@@ -371,13 +376,14 @@ def getprojectassignees(request):
 @api_view(["POST"])
 def inviteprojectassignees(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = InviteProjectAssigneeSerializer(data=data)
         if serializer.is_valid():
             project_id = serializer.data["project_id"]
             assignee_ids = serializer.data["assignee_ids"]
             assignee_ids = str(assignee_ids).split(",")
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             projectdata = ProjectModel.objects.filter(id=project_id,user_id=user_id).first()    
             userdata = UserModel.objects.filter(id=user_id).first() 
             if not userdata:

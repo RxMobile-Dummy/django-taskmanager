@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     'tags',
     'rest_framework',
     'rest_framework_swagger',
-    'drf_yasg'
+    'drf_yasg',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'django_jwt_extended'
 ]
 
 MIDDLEWARE = [
@@ -146,4 +149,18 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = 'anirudhflutter@gmail.com'
 EMAIL_HOST_PASSWORD = 'yxhyhxbnrqstyaek'
 
-REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' }
+REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAdminUser',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+ }
+
+# JWT settings
+JWT_TOKEN_EXPIRY = 1    # No. of days
+JWT_ALGORITHM = 'HS256'  # Algorithm specified by JWT
+JWT_UTF = 'utf-8'

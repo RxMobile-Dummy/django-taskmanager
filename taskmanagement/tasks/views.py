@@ -5,6 +5,8 @@ from .serializers import *
 from projects.models import ProjectModel
 from user_auth.models import *
 from drf_yasg.utils import swagger_auto_schema
+from user_auth.authentication import Authentication
+
 # Create your views here.
 
 
@@ -12,10 +14,11 @@ from drf_yasg.utils import swagger_auto_schema
 @api_view(["POST"])
 def addnewtask(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddTaskSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             project_id = serializer.data["project_id"]
             name = serializer.data["name"]
             comment = serializer.data["comment"]
@@ -68,10 +71,11 @@ def addnewtask(request):
 @api_view(["POST"])
 def updatetask(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = UpdateTaskSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             task_id = serializer.data["id"]
             project_id = serializer.data["project_id"]
             name = serializer.data["name"]
@@ -131,10 +135,11 @@ def updatetask(request):
 @api_view(["POST"])
 def deletetask(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = DeleteTaskSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             task_id = serializer.data["id"]
             task = TaskModel.objects.filter(id=task_id).first()
             if not UserModel.objects.filter(id=user_id).first():
@@ -152,10 +157,11 @@ def deletetask(request):
 @api_view(["POST"])
 def gettask(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetTaskSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             project_id = serializer.data["project_id"]
             task_id = serializer.data["id"]
             user = UserModel.objects.filter(id=user_id).first()
