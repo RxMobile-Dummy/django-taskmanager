@@ -5,16 +5,19 @@ from .serializers import *
 from tasks.models import TaskModel
 from user_auth.models import *
 from drf_yasg.utils import swagger_auto_schema
+from user_auth.authentication import Authentication
+
 # Create your views here.
 
 @swagger_auto_schema(method='POST', request_body=AddTagSerializer)
 @api_view(["POST"])
 def addtag(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddTagSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             task_id = serializer.data["task_id"]
             name = serializer.data["name"]
             user = UserModel.objects.filter(id=user_id).first()
@@ -38,10 +41,11 @@ def addtag(request):
 @api_view(["POST"])
 def updatetag(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = UpdateTagSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             task_id = serializer.data["task_id"]
             name = serializer.data["name"]
             tag_id = serializer.data["id"]
@@ -76,10 +80,11 @@ def updatetag(request):
 @api_view(["POST"])
 def deletetag(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = DeleteTagSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             tag_id = serializer.data["id"]
             tag = TagModel.objects.filter(id=tag_id,user_id=user_id).first()
             if not UserModel.objects.filter(id=user_id).first():
@@ -97,10 +102,11 @@ def deletetag(request):
 @api_view(["POST"])
 def gettags(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetTagSerializer(data=data)
         if serializer.is_valid():
-            user_id = serializer.data["user_id"]
+            user_id = authenticated_user[0].id
             tag_id = serializer.data["id"]
             if (tag_id == None):
                 tagdata=list(TagModel.objects.values())

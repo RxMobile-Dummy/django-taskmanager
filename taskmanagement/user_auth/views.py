@@ -8,6 +8,14 @@ import uuid
 from django.core.mail import EmailMessage  
 # Create your views here.
 from drf_yasg.utils import swagger_auto_schema
+from .authentication import Authentication
+from django_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    create_refresh_token
+) 
+from django.http.response import JsonResponse
+
 
 @swagger_auto_schema(method='POST', request_body=UserSerializer)
 @api_view(["POST"])
@@ -27,12 +35,7 @@ def signup(request):
             if not roledata:
                 return Response({"successs" : False,"message":"Role id is not valid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
             if user:
-                userdata=list(UserModel.objects.values().filter(mobile_number=mobile_number,email=email_id))
-                userdata[0].pop("password")
-                userdata[0].pop("is_active")
-                userdata[0].pop("is_delete")
-                userdata[0].pop("user_id")
-                return Response({"successs" : False,"data" : userdata[0],"message":"Profile already exists."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response({"successs" : False,"message":"Profile already exists."}, status=status.HTTP_406_NOT_ACCEPTABLE)
             UserStatusData = UserStatusModel.objects.filter(user_status="Active").first()
             user_status_id = ""
             if UserStatusData:
@@ -45,6 +48,8 @@ def signup(request):
             userdetails[0].pop("is_delete")
             userdetails[0].pop("user_id")
             userdetails[0].pop("password")
+            userdetails.append("authentication_token")
+            userdetails[0]["authentication_token"] = serializer.get_token(new_user)
             return Response({"successs" : True,"data" : userdetails[0],"message":"User created successfully"}, status=status.HTTP_201_CREATED)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -54,7 +59,10 @@ def signup(request):
 @api_view(["POST"])
 def signin(request):
     try:
+        authenticated_user = Authentication().authenticate(request)
         data = request.data
+        print("request.meta")
+        print(request.headers)
         serializer = SignInSerializer(data=data)
         if serializer.is_valid():
             password = serializer.data["password"]
@@ -67,7 +75,10 @@ def signin(request):
             userdata[0].pop("is_active")
             userdata[0].pop("is_delete")
             userdata[0].pop("user_id")
-            return JsonResponse({"successs" : True,"data" : userdata[0],"message":"User logged in successfully"}, safe=False)
+            if authenticated_user:
+                return JsonResponse({"successs" : True,"data" : userdata[0],"message":"User logged in successfully"}, safe=False)
+            else:
+                Response({"success" : False,"message":"Invalid data"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
