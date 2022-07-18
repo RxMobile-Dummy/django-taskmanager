@@ -19,11 +19,6 @@ class UserSerializer(serializers.ModelSerializer):
         password_validation.validate_password(value, self.instance)
         return value
 
-    @staticmethod
-    def get_token(user):
-        """Function to get user token"""
-        return JWTUtility.encode_token(user)
-
 
 class SignInSerializer(serializers.ModelSerializer):
     """Serializer for user sign in"""
@@ -31,6 +26,11 @@ class SignInSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = UserModel
         fields = ['email', 'password']
+    
+    @staticmethod
+    def get_token(user):
+        """Function to get user token"""
+        return JWTUtility.encode_token(user)
 
 
 class ForgotPasswordSerializer(serializers.ModelSerializer):
