@@ -1,17 +1,25 @@
+"""Apis for tag module"""
+from multiprocessing import AuthenticationError
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .serializers import *
-from tasks.models import TaskModel
-from user_auth.models import *
 from drf_yasg.utils import swagger_auto_schema
+from response import Response as ResponseData
+from tags.models import TagModel
+from tags.serializers import AddTagSerializer, DeleteTagSerializer
+from tags.serializers import GetTagSerializer, UpdateTagSerializer
+from tasks.models import TaskModel
 from user_auth.authentication import Authentication
+from user_auth.models import UserModel
+
 
 # Create your views here.
 
-@swagger_auto_schema(method='POST', request_body=AddTagSerializer)
+
+@swagger_auto_schema(method="POST", request_body=AddTagSerializer)
 @api_view(["POST"])
 def addtag(request):
+    """Function to add tag"""
     try:
         authenticated_user = Authentication().authenticate(request)
         data = request.data
@@ -22,24 +30,42 @@ def addtag(request):
             name = serializer.data["name"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
-                return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response(
+                    ResponseData.error("User does not exists"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
             task = TaskModel.objects.filter(id=task_id).first()
             if not task:
-                return Response({"successs" : False,"message":"Task does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            new_tag = TagModel.objects.create(user_id=user_id,task_id=task_id,name=name)
+                return Response(
+                    ResponseData.error("Task does not exists"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
+            new_tag = TagModel.objects.create(
+                user_id=user_id, task_id=task_id, name=name
+            )
             new_tag.save()
-            tagdata = list(TagModel.objects.values().filter(id=new_tag.id))
-            tagdata[0].pop("is_active")
-            tagdata[0].pop("is_delete")
-            return Response({"successs" : True,"data" : tagdata[0],"message":"Tag added successfully"}, status=status.HTTP_201_CREATED)
-        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            tag_data = list(TagModel.objects.values().filter(id=new_tag.id))
+            tag_data[0].pop("is_active")
+            tag_data[0].pop("is_delete")
+            return Response(
+                ResponseData.success(tag_data[0], "Tag added successfully"),
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            ResponseData.error(serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as exception:
+        return Response(
+            ResponseData.error(str(exception)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
-@swagger_auto_schema(method='POST', request_body=UpdateTagSerializer)
+@swagger_auto_schema(method="POST", request_body=UpdateTagSerializer)
 @api_view(["POST"])
-def updatetag(request):
+def update_tag(request):
+    """Function to update tag"""
     try:
         authenticated_user = Authentication().authenticate(request)
         data = request.data
@@ -51,34 +77,54 @@ def updatetag(request):
             tag_id = serializer.data["id"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
-                return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            tag = TagModel.objects.filter(id=tag_id).first()
-            if not tag:
-                return Response({"successs" : False,"message":"Tag does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            if(task_id != ""):
-               taskdata = TaskModel.objects.filter(id=task_id).first()
-               if not taskdata:
-                return Response({"successs" : False,"message":"Task id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            tagdata = TagModel.objects.filter(id=tag_id).first()
-            if not tagdata:
-                return Response({"successs" : False,"message":"Tag id does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            elif(tagdata.name == name):
-                   return Response({"successs" : False,"message":"Tag name is same as before"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response(
+                    ResponseData.error("User does not exists"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
+            if task_id != "":
+                task_data = TaskModel.objects.filter(id=task_id).first()
+                if not task_data:
+                    return Response(
+                        ResponseData.error("Task id does not exists"),
+                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                    )
+            tag_data = TagModel.objects.filter(id=tag_id).first()
+            if not tag_data:
+                return Response(
+                    ResponseData.error("Tag id does not exists"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
+            elif tag_data.name == name:
+                return Response(
+                    ResponseData.error("Tag name is same as before"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
             else:
-                   tagdata.name = name
-                   tagdata.save()
-                   tag = list(TagModel.objects.values().filter(id=tagdata.id))
-                   tag[0].pop("is_active")
-                   tag[0].pop("is_delete")
-                   return Response({"successs" : True,"data" : tag[0],"message":"Tag name updated successfully"}, status=status.HTTP_201_CREATED)
-        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                tag_data.name = name
+                tag_data.save()
+                tag = list(TagModel.objects.values().filter(id=tag_data.id))
+                tag[0].pop("is_active")
+                tag[0].pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        tag[0], "Tag name updated successfully"),
+                    status=status.HTTP_201_CREATED,
+                )
+        return Response(
+            ResponseData.error(serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as exception:
+        return Response(
+            ResponseData.error(str(exception)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
-@swagger_auto_schema(method='POST', request_body=DeleteTagSerializer)
+@swagger_auto_schema(method="POST", request_body=DeleteTagSerializer)
 @api_view(["POST"])
-def deletetag(request):
+def delete_tag(request):
+    """Function to delete tag"""
     try:
         authenticated_user = Authentication().authenticate(request)
         data = request.data
@@ -86,21 +132,37 @@ def deletetag(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             tag_id = serializer.data["id"]
-            tag = TagModel.objects.filter(id=tag_id,user_id=user_id).first()
+            tag = TagModel.objects.filter(id=tag_id, user_id=user_id).first()
             if not UserModel.objects.filter(id=user_id).first():
-                return Response({"successs" : False,"message":"Account does not exists"}, status=status.HTTP_201_CREATED)
+                return Response(
+                    ResponseData.error("User does not exists"),
+                    status=status.HTTP_201_CREATED,
+                )
             if not tag:
-                return Response({"successs" : False,"message":"Tag does not exists"}, status=status.HTTP_201_CREATED)
-            TagModel.objects.filter(id=tag_id,user_id=user_id).delete()
-            return Response({"success" : True,"message":"Tag deleted successfully"}, status=status.HTTP_200_OK)
-        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    ResponseData.error("Tag id does not exists"),
+                    status=status.HTTP_201_CREATED,
+                )
+            TagModel.objects.filter(id=tag_id, user_id=user_id).delete()
+            return Response(
+                ResponseData.success_without_data("Tag deleted successfully"),
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            ResponseData.error(serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as exception:
+        return Response(
+            ResponseData.error(str(exception)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
-@swagger_auto_schema(method='POST', request_body=GetTagSerializer)
+@swagger_auto_schema(method="POST", request_body=GetTagSerializer)
 @api_view(["POST"])
 def gettags(request):
+    """Function to get tags details"""
     try:
         authenticated_user = Authentication().authenticate(request)
         data = request.data
@@ -108,30 +170,63 @@ def gettags(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             tag_id = serializer.data["id"]
-            if (tag_id == None):
-                tagdata=list(TagModel.objects.values())
-                if(len(tagdata)==0):
-                     return Response({"successs" : True,"data" : tagdata,"message":"No tag found"}, status=status.HTTP_201_CREATED)
-                if(len(tagdata)==1):
-                    tagdata[0].pop("is_active")
-                    tagdata[0].pop("is_delete")
-                    return Response({"successs" : True,"data" : tagdata[0],"message":"Tag details fetched successfully"}, status=status.HTTP_201_CREATED)
-                for i in range(0,len(tagdata)):
-                    tagdata[i].pop("is_active")
-                    tagdata[i].pop("is_delete")
-                return Response({"successs" : True,"data" : tagdata,"message":"Tag details fetched successfully"}, status=status.HTTP_201_CREATED)
+            if tag_id is None:
+                tag_data = list(TagModel.objects.values())
+                if len(tag_data) == 0:
+                    return Response(
+                        ResponseData.success(tag_data, "No tag found"),
+                        status=status.HTTP_201_CREATED,
+                    )
+                if len(tag_data) == 1:
+                    tag_data[0].pop("is_active")
+                    tag_data[0].pop("is_delete")
+                    return Response(
+                        ResponseData.success(
+                            tag_data[0], "Tag details fetched successfully"),
+                        status=status.HTTP_201_CREATED,
+                    )
+                for i,ele in enumerate(tag_data):
+                    ele.pop("is_active")
+                    ele.pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        tag_data, "Tag details fetched successfully"),
+                    status=status.HTTP_201_CREATED,
+                )
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
-                return Response({"successs" : False,"message":"User does not exists"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            tagdata = TagModel.objects.filter(id=tag_id,task_id=task_id,user_id=user_id).first()
-            if not tagdata:
-                return Response({"successs" : False,"message":"Tag does not exists or is invalid"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response(
+                    ResponseData.error("User does not exists"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
+            tag_data = TagModel.objects.filter(
+                id=tag_id, task_id=task_id, user_id=user_id
+            ).first()
+            if not tag_data:
+                return Response(
+                    ResponseData.error("Tag id does not exists"),
+                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                )
             else:
-                tags=list(TagModel.objects.values().filter(id=tag_id,task_id=task_id,user_id=user_id))
+                tags = list(
+                    TagModel.objects.values().filter(
+                        id=tag_id, task_id=task_id, user_id=user_id
+                    )
+                )
                 tags[0].pop("is_active")
                 tags[0].pop("is_delete")
-                return Response({"successs" : True,"data" : tags[0],"message":"Tag details fetched successfully"}, status=status.HTTP_201_CREATED)
-        return Response({"success" : False,"message":serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({"error":str(e), "message":"Something went wrong"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(
+                    ResponseData.success(
+                        tags[0], "Tag details fetched successfully"),
+                    status=status.HTTP_201_CREATED,
+                )
+        return Response(
+            ResponseData.error(serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as exception:
+        return Response(
+            ResponseData.error(str(exception)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

@@ -1,44 +1,54 @@
 import jwt
 
-from user_auth.models import UserModel
 from datetime import datetime, timedelta
-from rest_framework_simplejwt.tokens import RefreshToken
-from django_jwt_extended.apps import DjangoJwtExtConfig
 from django.apps import apps
 
 
 from taskmanagement import settings
 
-class JWTUtility(object):
+
+class JWTUtility:
     """
     JWT Utility contains utility methods for dealing with JWTokens using Python JWT
 
     - JWT_TOKEN_EXPIRY: No. of minutes
     """
-    JWT_TOKEN_EXPIRY = getattr(settings, 'JWT_TOKEN_EXPIRY', timedelta(minutes=30))
+
+    JWT_TOKEN_EXPIRY = getattr(
+        settings, "JWT_TOKEN_EXPIRY", timedelta(minutes=30))
 
     @staticmethod
-    def encode_token(UserModel):
+    def encode_token(User_Model):
         """
         Token created against username of the user.
         """
-        if UserModel:
+        if User_Model:
             data = {
-                'exp': datetime.utcnow() + timedelta(days=settings.JWT_TOKEN_EXPIRY),
-                'email': UserModel.email,
-                'password' : UserModel.password
+                "exp": datetime.utcnow() + timedelta(days=settings.JWT_TOKEN_EXPIRY),
+                "email": User_Model.email,
+                "mobile_number": str(User_Model.mobile_number),
             }
-            config = apps.get_app_config('django_jwt_extended')
-            refreshdata = {
-                'exp': datetime.utcnow() + config.refresh_token_expires,
-                'email': UserModel.email,
-                'password' : UserModel.password
+            config = apps.get_app_config("django_jwt_extended")
+            refresh_data = {
+                "exp": datetime.utcnow() + config.refresh_token_expires,
+                "email": User_Model.email,
+                "mobile_number": str(User_Model.mobile_number),
             }
-            token = jwt.encode(data, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+            token = jwt.encode(
+                data, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+            )
             return {
-        'refresh': str(jwt.encode(refreshdata, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)).replace("b'", "").replace("'", ""),
-        'access': str(token).replace("b'", "").replace("'", ""),
-    }
+                "refresh": str(
+                    jwt.encode(
+                        refresh_data,
+                        settings.SECRET_KEY,
+                        algorithm=settings.JWT_ALGORITHM,
+                    )
+                )
+                .replace("b'", "")
+                .replace("'", ""),
+                "access": str(token).replace("b'", "").replace("'", ""),
+            }
         # raise User.DoesNotExist
 
     @staticmethod
@@ -47,7 +57,8 @@ class JWTUtility(object):
         Check if token is valid.
         """
         try:
-            jwt.decode(token, settings.SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
+            jwt.decode(token, settings.SECRET_KEY,
+                       algorithms=settings.JWT_ALGORITHM)
             return True, "Valid"
         except jwt.ExpiredSignatureError:
             return False, "Token Expired"
@@ -59,7 +70,9 @@ class JWTUtility(object):
         """
         return user for the token given.
         """
-        username_dict = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.JWT_ALGORITHM)
+        username_dict = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=settings.JWT_ALGORITHM
+        )
         print("username_dict")
         print(username_dict)
         return username_dict

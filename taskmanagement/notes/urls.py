@@ -1,10 +1,10 @@
+"""Url patterns for note module"""
 from django.urls import path
 from . import views
-from .views import *
 
 urlpatterns = [
-	path('addnewnote/', views.addnewnote, name="addnewnote"),
-	path('updatenote/', views.updatenote, name="updatenote"),
-	path('deletenote/', views.deletenote, name="deletenote"),
-	path('getnote/', views.getnote, name="getnote"),
+    path('add_new_note/', views.add_new_note, name="add_new_note"),
+    path('update_note/', views.update_note, name="update_note"),
+    path('delete_note/', views.delete_note, name="delete_note"),
+    path('get_note/', views.get_note, name="get_note"),
 ]

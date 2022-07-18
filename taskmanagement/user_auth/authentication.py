@@ -1,14 +1,17 @@
+"""Class for token authentication"""
+
 from rest_framework import authentication
 from rest_framework import exceptions
+from jwt_utility import JWTUtility
 from .models import UserModel
-from jwt_utility import *
+from response import Response as ResponseData
 
 
 class Authentication(authentication.BaseAuthentication):
-    """
-    Authenticate user using JWT utility
-    """
+    """Authenticate user using JWT utility """
+
     def authenticate(self, request):
+        """Function to authenticate token passed in all apis"""
         if 'Api-Key' in request.headers:
             token = request.headers.get('Api-Key').replace("Bearer ", "")
             if not token:
@@ -19,9 +22,15 @@ class Authentication(authentication.BaseAuthentication):
                 print("data")
                 print(data)
                 try:
-                    user = UserModel.objects.filter(email=data["email"],password = data["password"]).first()
-                except UserModel.DoesNotExist:
-                    raise exceptions.AuthenticationFailed('No such user exists')
+                    user = UserModel.objects.filter(
+                        email=data["email"], mobile_number=data["mobile_number"]).first()
+                    if not user:
+                        raise exceptions.AuthenticationFailed(
+                        'Invalid token')
+                except Exception as exc:
+                    print(exc)
+                    raise exceptions.AuthenticationFailed(
+                        'No such user exists')
                 return user, None
             raise exceptions.AuthenticationFailed(message)
         raise exceptions.AuthenticationFailed('No token provided')
