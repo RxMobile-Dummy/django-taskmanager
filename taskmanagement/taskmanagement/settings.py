@@ -15,7 +15,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+DEFAULT_PORT = "8080"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--_t)&hwjzixaj$$83hve-$ck0ab=#ohre4_5@$g7d=#39@egwo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['928e-180-211-112-179.in.ngrok.io', "127.0.0.1"]
 
 
 # Application definition
@@ -66,7 +66,7 @@ ROOT_URLCONF = 'taskmanagement.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,8 +75,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'libraries' : {
-                'staticfiles': 'django.templatetags.static', 
+            'libraries': {
+                'staticfiles': 'django.templatetags.static',
             }
         },
     },
@@ -90,15 +90,14 @@ WSGI_APPLICATION = 'taskmanagement.wsgi.application'
 
 DATABASES = {
     'default': {
-       'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'taskmanagementdemo',
         'USER': 'postgres',
-        'PASSWORD':'',
+        'PASSWORD': '',
         'HOST': 'localhost',
-        'PORT':'',
+        'PORT': '',
     }
 }
-
 
 
 # Password validation
@@ -149,16 +148,16 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = 'anirudhflutter@gmail.com'
 EMAIL_HOST_PASSWORD = 'yxhyhxbnrqstyaek'
 
-REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
-'DEFAULT_PERMISSION_CLASSES': (
-        # 'rest_framework.permissions.IsAdminUser',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    )
- }
+REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+                  'DEFAULT_PERMISSION_CLASSES': (
+                      # 'rest_framework.permissions.IsAdminUser',
+                  ),
+                  'DEFAULT_AUTHENTICATION_CLASSES': (
+                      'rest_framework.authentication.TokenAuthentication',
+                      'rest_framework.authentication.BasicAuthentication',
+                      'rest_framework.authentication.SessionAuthentication',
+                  )
+                  }
 
 # JWT settings
 JWT_TOKEN_EXPIRY = 1    # No. of days

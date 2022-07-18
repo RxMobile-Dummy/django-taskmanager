@@ -1,11 +1,11 @@
+"""Url patterns for comments module"""
 from django.urls import path
 from . import views
-from .views import *
 
 urlpatterns = [
-	path('addnewcomment/', views.addnewcomment, name="addnewcomment"),
-	path('updatecomment/', views.updatecomment, name="updatecomment"),
-	path('deletecomment/', views.deletecomment, name="deletecomment"),
-	path('getcomments/', views.getcomments, name="getcomments"),
+    path('add_new_comment/', views.add_new_comment, name="add_new_comment"),
+    path('update_comment/', views.update_comment, name="update_comment"),
+    path('delete_comment/', views.delete_comment, name="delete_comment"),
+    path('getcomments/', views.getcomments, name="getcomments"),
 
 ]
