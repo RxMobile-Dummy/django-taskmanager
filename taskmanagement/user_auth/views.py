@@ -50,8 +50,8 @@ def signup(request):
                     ResponseData.error("Email already exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
-            mobile_number = UserModel.objects.filter(mobile_number=mobile_number).first()
-            if mobile_number:
+            mobile_number_data = UserModel.objects.filter(mobile_number=mobile_number).first()
+            if mobile_number_data:
                 return Response(
                     ResponseData.error("Mobile Number already exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
@@ -71,16 +71,13 @@ def signup(request):
                 role=role,
                 status_id=user_status_id,
             )
-            # new_user.save()
+            new_user.save()
             user_details = list(
                 UserModel.objects.values().filter(id=new_user.id))
             user_details[0].pop("is_active")
             user_details[0].pop("is_delete")
             user_details[0].pop("user_id")
             user_details[0].pop("password")
-            user_details.append("authentication_token")
-            user_details[0]["authentication_token"] = serializer.get_token(
-                new_user)
             return Response(
                 ResponseData.success(
                     user_details[0], "User created successfully"),
@@ -100,14 +97,13 @@ def signup(request):
 def signin(request):
     """Function to let user sign in"""
     try:
-        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = SignInSerializer(data=data)
         if serializer.is_valid():
             
             password = serializer.data["password"]
             email = serializer.data["email"]
-            user = UserModel.objects.filter(id=authenticated_user[0].id,
+            user = UserModel.objects.filter(
                 email=email, password=password).first()
             if not user:
                 return Response(
@@ -120,16 +116,13 @@ def signin(request):
             userdata[0].pop("is_active")
             userdata[0].pop("is_delete")
             userdata[0].pop("user_id")
-            if authenticated_user:
-                return JsonResponse(
+            userdata.append("authentication_token")
+            userdata[0]["authentication_token"] = serializer.get_token(
+                userdata[0])
+            return JsonResponse(
                     ResponseData.success(
                         userdata[0], "User logged in successfully"),
                     safe=False,
-                )
-            else:
-                Response(
-                    ResponseData.error("Invalid data"),
-                    status=status.HTTP_400_BAD_REQUEST,
                 )
         return Response(
             ResponseData.error(serializer.errors),
@@ -153,10 +146,9 @@ class generateKey:
 def forgot_password(request):
     """Function to send activation link on email id"""
     try:
-        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = ForgotPasswordSerializer(data=data)
-        if serializer.is_valid() and authenticated_user:
+        if serializer.is_valid():
             email = serializer.data["email"]
             keygen = generateKey()
             key = base64.b32encode(keygen.returnValue(email).encode())  # Key is generated
@@ -198,20 +190,19 @@ def forgot_password(request):
 def reset_password(request):
     """Function to reset password for the user"""
     try:
-        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = ResetPasswordSerializer(data=data)
-        if serializer.is_valid() and authenticated_user:
+        if serializer.is_valid():
+            if serializer.data["password"] != "":
+                password_validation.validate_password(
+                    serializer.data["password"])
             userdata = UserModel.objects.filter(
-                id=authenticated_user[0].id).first()
+                password=serializer.data["password"]).first()
             if not userdata:
                 return Response(
                     {"success": False, "message": "Account does not exists"},
                     status=status.HTTP_404_NOT_FOUND,
                 )
-            if serializer.data["password"] != "":
-                password_validation.validate_password(
-                    serializer.data["password"])
             keygen = generateKey()
             key = base64.b32encode(keygen.returnValue(userdata.email).encode())  # Generating Key
             OTP = pyotp.HOTP(key)  # HOTP Model
