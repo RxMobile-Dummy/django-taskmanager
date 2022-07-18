@@ -770,7 +770,7 @@ def change_password(request):
 
 
 
-@swagger_auto_schema(method="POST", request_body=ChangePasswordSerializer)
+@swagger_auto_schema(method="POST")
 @api_view(["POST"])
 def refresh_token(request):
     """Function to refresh token for a user"""
@@ -778,21 +778,26 @@ def refresh_token(request):
         authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = RefreshAuthTokenSerializer(data=data)
-        if serializer.is_valid() and authenticated_user is not None:
+        if authenticated_user is not None:
             userdata = UserModel.objects.filter(
-                mobile_number=serializer.data["mobile_number"],email = serializer.data["email"]
+                id=authenticated_user[0].id
             ).first()
-            if not userdata:
-                return Response(
-                    ResponseData.error("Credentials are incorrect"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
-                )
             user_details = list(
                 UserModel.objects.values().filter(id=authenticated_user[0].id))
             user_details[0].pop("is_active")
             user_details[0].pop("is_delete")
             user_details[0].pop("user_id")
             user_details[0].pop("password")
+            user_details[0].pop("first_name")
+            user_details[0].pop("last_name")
+            user_details[0].pop("status_id")
+            user_details[0].pop("profile_pic")
+            user_details[0].pop("email")
+            user_details[0].pop("mobile_number")
+            user_details[0].pop("role")
+            user_details[0].pop("created_at")
+            user_details[0].pop("updated_at")
+            user_details[0].pop("id")
             user_details.append("access_token")
             user_details[0]["access_token"] = serializer.get_token(
                 userdata)
