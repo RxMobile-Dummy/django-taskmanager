@@ -52,6 +52,43 @@ class JWTUtility:
             }
         # raise User.DoesNotExist
 
+
+    @staticmethod
+    def encode_refresh_token(User_Model):
+        """
+        Token created against username of the user.
+        """
+        print(User_Model)
+        if User_Model:
+            data = {
+                "exp": datetime.utcnow() + timedelta(days=settings.JWT_TOKEN_EXPIRY),
+                "email": User_Model.email,
+                "mobile_number": str(User_Model.mobile_number),
+            }
+            config = apps.get_app_config("django_jwt_extended")
+            refresh_data = {
+                "exp": datetime.utcnow() + config.refresh_token_expires,
+                "email": User_Model.email,
+                "mobile_number": str(User_Model.mobile_number),
+            }
+            token = jwt.encode(
+                data, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+            )
+            return {
+                "refresh": str(
+                    jwt.encode(
+                        refresh_data,
+                        settings.SECRET_KEY,
+                        algorithm=settings.JWT_ALGORITHM,
+                    )
+                )
+                .replace("b'", "")
+                .replace("'", ""),
+                "access": str(token).replace("b'", "").replace("'", ""),
+            }
+        # raise User.DoesNotExist
+
+
     @staticmethod
     def is_token_valid(token):
         """

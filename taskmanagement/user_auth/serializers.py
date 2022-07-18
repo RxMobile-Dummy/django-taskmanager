@@ -174,4 +174,4 @@ class RefreshAuthTokenSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_token(user):
         """Function to get user token"""
-        return JWTUtility.encode_token(user)
+        return JWTUtility.encode_refresh_token(user)

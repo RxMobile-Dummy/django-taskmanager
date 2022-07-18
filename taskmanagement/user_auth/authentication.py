@@ -12,8 +12,8 @@ class Authentication(authentication.BaseAuthentication):
 
     def authenticate(self, request):
         """Function to authenticate token passed in all apis"""
-        if 'Api-Key' in request.headers:
-            token = request.headers.get('Api-Key').replace("Bearer ", "")
+        if 'Authorization' in request.headers:
+            token = request.headers.get('Authorization').replace("Bearer ", "")
             if not token:
                 raise exceptions.AuthenticationFailed('No token provided')
             is_valid, message = JWTUtility.is_token_valid(token)
