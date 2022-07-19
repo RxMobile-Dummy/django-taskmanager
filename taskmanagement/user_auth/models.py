@@ -13,7 +13,7 @@ class UserModel(models.Model):
     user_id = models.CharField(max_length=50, default="")
     last_name = models.CharField(max_length=50)
     status_id = models.CharField(max_length=50, default="")
-    profile_pic = models.FileField()
+    profile_pic = models.FileField(blank=True)
     email = models.EmailField()
     mobile_number = PhoneNumberField()
     password = models.CharField(max_length=20)
