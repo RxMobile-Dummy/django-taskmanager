@@ -14,7 +14,7 @@ from comments.models import CommentModel
 from comments.serializers import AddCommentSerializer
 from comments.serializers import DeleteCommentSerializer
 from comments.serializers import GetCommentSerializer, UpdateCommentSerializer
-
+from django.forms.models import model_to_dict
 # Create your views here.
 
 
@@ -29,10 +29,10 @@ def add_new_comment(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             comment_user_id = serializer.data["comment_user_id"]
-            project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             description = serializer.data["description"]
-            user = UserModel.objects.filter(id=user_id,email = authenticated_user[0].email,mobile_number = authenticated_user[0].mobile_number).first()
+            user = UserModel.objects.filter(id=user_id,email = authenticated_user[0].email,
+            mobile_number = authenticated_user[0].mobile_number).first()
             comment_user = UserModel.objects.filter(id=comment_user_id,).first()
             if not user:
                 return Response(
@@ -50,30 +50,9 @@ def add_new_comment(request):
                         "User id and comment user id cannot be same"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
-            if project_id != "":
-                project = ProjectModel.objects.filter(id=project_id).first()
-                if not project:
-                    return Response(
-                        ResponseData.error("Project does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
-                    )
-            if task_id != "":
-                assignee = TaskModel.objects.filter(id=task_id).first()
-                if not assignee:
-                    return Response(
-                        ResponseData.error("Task does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
-                    )
-            if project_id == "" and task_id == "":
-                return Response(
-                    ResponseData.error(
-                        "Project id and task id cannot be empty together"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
-                )
             new_comment = CommentModel.objects.create(
                 user_id=user_id,
                 comment_user_id=comment_user_id,
-                project_id=project_id,
                 task_id=task_id,
                 description=description,
             )
@@ -109,7 +88,6 @@ def update_comment(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
-            project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             description = serializer.data["description"]
             user = UserModel.objects.filter(id=user_id).first()
@@ -124,15 +102,6 @@ def update_comment(request):
                     ResponseData.error("Comment does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
-            if project_id != "":
-                project_data = ProjectModel.objects.filter(
-                    id=project_id).first()
-                if not project_data:
-                    return Response(
-                        ResponseData.error(
-                            "Project id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
-                    )
             if task_id != "":
                 task_data = TaskModel.objects.filter(id=task_id).first()
                 if not task_data:
@@ -183,11 +152,9 @@ def delete_comment(request):
             user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
             comment_user_id = serializer.data["comment_user_id"]
-            project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             comment = CommentModel.objects.filter(
                 id=comment_id,
-                project_id=project_id,
                 task_id=task_id,
                 comment_user_id=comment_user_id,
             ).first()
@@ -203,7 +170,6 @@ def delete_comment(request):
                 )
             CommentModel.objects.filter(
                 id=comment_id,
-                project_id=project_id,
                 task_id=task_id,
                 comment_user_id=comment_user_id,
             ).delete()
@@ -235,24 +201,18 @@ def getcomments(request):
             user_id = authenticated_user[0].id
             comment_user_id = serializer.data["comment_user_id"]
             comment_id = serializer.data["id"]
-            project_id = serializer.data["project_id"]
             task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
+            user_data_copy = list(UserModel.objects.values().filter(id=user_id))
+            # user_data_copy[0].pop("profile_pic")
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
-            if project_id == "" and task_id == "":
-                return Response(
-                    ResponseData.error(
-                        "Project id and task id cannot be empty together"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
-                )
             if comment_id is None:
                 comment_data = list(
                     CommentModel.objects.values().filter(
-                        project_id=project_id,
                         task_id=task_id,
                         comment_user_id=comment_user_id,
                     )
@@ -263,38 +223,45 @@ def getcomments(request):
                         status=status.HTTP_406_NOT_ACCEPTABLE,
                     )
                 if len(comment_data) == 1:
+                    print(comment_data)
                     comment_data[0].pop("is_active")
                     comment_data[0].pop("is_delete")
+                    comment_data[0].update({"user_data" : (user_data_copy[0])})
                     return Response(
                         ResponseData.success(
                             comment_data[0], "Comment details fetched successfully"),
                         status=status.HTTP_201_CREATED,
                     )
-                for i,ele in enumerate(comment_data):
-                    ele.pop("is_active")
-                    ele.pop("is_delete")
+                for i in range(0,len(comment_data)):
+                    print(comment_data)
+                    comment_data[i].update({"user_data" : (user_data_copy[0])})
+                    comment_data[i].pop("is_active")
+                    comment_data[i].pop("is_delete")
+                print(user_id)                                   
                 return Response(
                     ResponseData.success(
                         comment_data, "Comment details fetched successfully"),
                     status=status.HTTP_201_CREATED,
                 )
-            comment_data = CommentModel.objects.filter(
-                id=comment_id,
-                project_id=project_id,
-                task_id=task_id,
-                comment_user_id=comment_user_id,
-            ).first()
-            if not comment_data:
+            comment_data = list(
+                    CommentModel.objects.values().filter(
+                        id=comment_id,
+                        task_id=task_id,
+                        comment_user_id=comment_user_id,
+                    )
+                )
+            if len(comment_data) == 0:
                 return Response(
                     ResponseData.error(
                         "Comment does not exists or is invalid"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             else:
+                comment_data.append("user_data")
+                comment_data[0]["user_data"] = user
                 comment_data = list(
                     CommentModel.objects.values().filter(
                         id=comment_id,
-                        project_id=project_id,
                         task_id=task_id,
                         comment_user_id=comment_user_id,
                     )

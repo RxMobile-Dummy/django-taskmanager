@@ -88,18 +88,36 @@ WSGI_APPLICATION = 'taskmanagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'taskmanagementdemo',
+#         'USER': 'postgres',
+#         'PASSWORD': '',
+#         'HOST': 'localhost',
+#         'PORT': '',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'taskmanagementdemo',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
+
+'default': {
+
+'ENGINE': 'django.db.backends.postgresql',
+
+'NAME': 'akash_kareliya',
+
+'USER': 'akash_kareliya',
+
+'PASSWORD': 'deep70',
+
+'HOST': 'localhost',
+
+'PORT': '',
+
 }
 
-
+}
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 

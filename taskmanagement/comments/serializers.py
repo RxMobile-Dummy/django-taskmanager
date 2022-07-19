@@ -31,7 +31,7 @@ class DeleteCommentSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = CommentModel
-        fields = ['project_id', 'task_id', 'comment_user_id', 'id']
+        fields = ['task_id', 'comment_user_id', 'id','pic']
 
 
 class GetCommentSerializer(serializers.ModelSerializer):
@@ -41,4 +41,4 @@ class GetCommentSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = CommentModel
-        fields = ['project_id', 'task_id', 'comment_user_id', 'id']
+        fields = ['task_id', 'comment_user_id', 'id']
