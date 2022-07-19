@@ -48,8 +48,9 @@ So we can identify 3 main components:
 ```
 
 #### Command to create a new Django Project : 
-
-- django-admin startproject mysite
+```sh
+django-admin startproject mysite
+```
 
 #### Command to create new django App : 
 ```sh
