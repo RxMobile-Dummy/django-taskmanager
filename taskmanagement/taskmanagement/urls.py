@@ -18,6 +18,7 @@ from django.urls import path, include
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 Schemaview = get_schema_view(
     openapi.Info(
@@ -45,3 +46,5 @@ urlpatterns = [
          cache_timeout=0), name='schema-redoc'),
     path('json/', Schemaview.without_ui(cache_timeout=0), name='schema-json'),
 ]
+
+# urlpatterns += staticfiles_urlpatterns()
