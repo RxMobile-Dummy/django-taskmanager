@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = UserModel
-        exclude = ["profile_pic", "user_id", "created_at",
+        exclude = ["user_id", "created_at",
                    "updated_at", "is_active", "is_delete", "status_id"]
 
     def validate_password(self, value):
@@ -54,7 +54,7 @@ class UserUpdateProfileSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = UserModel
-        exclude = ["profile_pic", "user_id", "created_at",
+        exclude = ["user_id", "created_at",
                    "updated_at", "is_active", "is_delete"]
 
 
