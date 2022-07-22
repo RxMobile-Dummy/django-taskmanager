@@ -31,14 +31,15 @@ def add_new_comment(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             comment_user_id = serializer.data["comment_user_id"]
-            task_id = serializer.data["task_id"]
+            # task_id = serializer.data["task_id"]
             description = serializer.data["description"]
             files = request.FILES.getlist("files")
             files_path = []
             if(len(files) > 5):
                 return Response(
                     ResponseData.error(
-                        "You can select max to max 5 files"),
+                        "You can select max to max 5 files",
+                        ),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             for f in files:
@@ -70,7 +71,7 @@ def add_new_comment(request):
             new_comment = CommentModel.objects.create(
                 user_id=user_id,
                 comment_user_id=comment_user_id,
-                task_id=task_id,
+                # task_id=task_id,
                 description=description,
                 files = files_path
             )
@@ -107,7 +108,7 @@ def update_comment(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
-            task_id = serializer.data["task_id"]
+            # task_id = serializer.data["task_id"]
             description = serializer.data["description"]
             files = request.FILES.getlist("files")
             user = UserModel.objects.filter(id=user_id).first()
@@ -122,14 +123,6 @@ def update_comment(request):
                     ResponseData.error("Comment does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
-            if task_id != "":
-                task_data = TaskModel.objects.filter(id=task_id).first()
-                if not task_data:
-                    return Response(
-                        ResponseData.error(
-                            "Task id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
-                    )
             comment_data = CommentModel.objects.filter(id=comment_id).first()
             if not comment_data:
                 return Response(
@@ -174,10 +167,10 @@ def delete_comment(request):
             user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
             comment_user_id = serializer.data["comment_user_id"]
-            task_id = serializer.data["task_id"]
+            # task_id = serializer.data["task_id"]
             comment = CommentModel.objects.filter(
                 id=comment_id,
-                task_id=task_id,
+                # task_id=task_id,
                 comment_user_id=comment_user_id,
             ).first()
             if not UserModel.objects.filter(id=user_id).first():
@@ -192,7 +185,7 @@ def delete_comment(request):
                 )
             CommentModel.objects.filter(
                 id=comment_id,
-                task_id=task_id,
+                # task_id=task_id,
                 comment_user_id=comment_user_id,
             ).delete()
             return Response(
@@ -223,7 +216,7 @@ def getcomments(request):
             user_id = authenticated_user[0].id
             comment_user_id = serializer.data["comment_user_id"]
             comment_id = serializer.data["id"]
-            task_id = serializer.data["task_id"]
+            # task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
             user_data_copy = list(UserModel.objects.values().filter(id=user_id))
             # user_data_copy[0].pop("profile_pic")
@@ -235,7 +228,7 @@ def getcomments(request):
             if comment_id is None:
                 comment_data = list(
                     CommentModel.objects.values().filter(
-                        task_id=task_id,
+                        # task_id=task_id,
                         comment_user_id=comment_user_id,
                     )
                 )
@@ -268,7 +261,7 @@ def getcomments(request):
             comment_data = list(
                     CommentModel.objects.values().filter(
                         id=comment_id,
-                        task_id=task_id,
+                        # task_id=task_id,
                         comment_user_id=comment_user_id,
                     )
                 )
@@ -284,7 +277,7 @@ def getcomments(request):
                 comment_data = list(
                     CommentModel.objects.values().filter(
                         id=comment_id,
-                        task_id=task_id,
+                        # task_id=task_id,
                         comment_user_id=comment_user_id,
                     )
                 )
