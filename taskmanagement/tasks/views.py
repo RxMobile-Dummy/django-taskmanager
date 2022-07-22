@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from response import Response as ResponseData
 from projects.models import ProjectModel
+# from taskmanagement.tasks import serializers
 from tasks.models import TaskModel, TaskStatusModel
 from tasks.serializers import AddTaskSerializer, DeleteTaskSerializer
 from tasks.serializers import AddTaskStatusSerializer, DeleteTaskStatusSerializer
@@ -13,7 +14,7 @@ from tasks.serializers import GetTaskSerializer, GetTaskStatusSerializer
 from tasks.serializers import UpdateTaskSerializer, UpdateTaskStatusSerializer
 from user_auth.authentication import Authentication
 from user_auth.models import UserModel
-
+import datetime
 
 # Create your views here.
 
@@ -23,6 +24,8 @@ from user_auth.models import UserModel
 def add_new_task(request):
     """Function to add new task"""
     try:
+        print("datetime.date.today()")
+        print(datetime.date.today())
         authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddTaskSerializer(data=data)
@@ -74,13 +77,13 @@ def add_new_task(request):
                     ResponseData.error(
                         "Reviewer and assignee cannot be assigned to same project"),
                     status=status.HTTP_406_NOT_ACCEPTABLE)
-            task_status_data = TaskStatusModel.objects.filter(
-                task_status="Pending").first()
-            task_status_id = ""
-            if task_status_data:
-                task_status_id = task_status_data.id
+            # task_status_data = TaskStatusModel.objects.filter(
+            #     task_status="Pending").first()
+            # task_status_id = ""
+            # if task_status_data:
+            #     task_status_id = task_status_data.id
             new_task = TaskModel.objects.create(user_id=user_id, project_id=project_id,
-            name=name, comment=comment, task_status=task_status_id,
+            name=name, comment=comment, isCompleted=False,
             description=description, is_private=is_private, priority=priority,
             reviewer_id=reviewer_id, assignee_id=assignee_id,
             tag_id=tag_id, start_date=start_date, end_date=end_date,)
@@ -111,7 +114,7 @@ def update_task(request):
             project_id = serializer.data["project_id"]
             name = serializer.data["name"]
             comment = serializer.data["comment"]
-            task_status = serializer.data["task_status"]
+            isCompleted = serializer.data["isCompleted"]
             description = serializer.data["description"]
             is_private = serializer.data["is_private"]
             priority = serializer.data["priority"]
@@ -160,7 +163,7 @@ def update_task(request):
             task = TaskModel.objects.filter(id=task_id).first()
             task.name = name
             task.comment = comment
-            task.task_status = task_status
+            task.isCompleted = isCompleted
             task.description = description
             task.is_private = is_private
             task.priority = priority
@@ -223,59 +226,86 @@ def get_task(request):
         serializer = GetTaskSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
-            project_id = serializer.data["project_id"]
-            task_id = serializer.data["id"]
+            # project_id = serializer.data["project_id"]
+            # task_id = serializer.data["id"]
+            date = request.data["date"] if request.data["date"] is not None else ""
+            if(date !=""):
+                print('str(date).split("/",2)')
+                print(str(date).split("/")[2])
+                date = str(date).split("/")[2] + "-" + str(date).split("/")[1] + "-" + str(date).split("/")[0] + "T00:00:00Z"
+            isCompleted = serializer.data["isCompleted"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE)
-            if project_id != "" and project_id is not None:
-                project = ProjectModel.objects.filter(id=project_id).first()
-                if not project:
+            elif(date != "" and isCompleted is None):
+                task_data = list(
+                    TaskModel.objects.values().filter(user_id=user_id,created_at = date))
+                if len(task_data) == 0:
                     return Response(
-                        ResponseData.error("Project id is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
-                else:
-                    project_data = list(ProjectModel.objects.values().filter(
-                            id=task_id, project_id=project_id))
-                if task_id != "" and task_id is not None:
-                    task_data = TaskModel.objects.filter(
-                        id=task_id, project_id=project_id).first()
-                    if not task_data:
-                        return Response(
-                            ResponseData.error("Task does not exists"),
-                            status=status.HTTP_406_NOT_ACCEPTABLE)
-                    else:
-                        task_data = list(TaskModel.objects.values().filter(
-                            id=task_id, project_id=project_id))
-                        task_data[0].pop("is_active")
-                        task_data[0].pop("is_delete")
-                        return Response(
-                            ResponseData.success(
-                                task_data, "Task details fetched successfully"),
-                            status=status.HTTP_201_CREATED)
-            elif task_id is not None:
-                task_data = TaskModel.objects.filter(id=task_id).first()
-                if not task_data:
-                    return Response(
-                        ResponseData.error("Task does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
-                else:
-                    task_data = list(
-                        TaskModel.objects.values().filter(id=task_id))
-                    if task_data[0]["project_id"] != "":
-                        return Response(
-                            ResponseData.error(
-                                "This task is bound with project id"),
-                            status=status.HTTP_201_CREATED)
+                        ResponseData.success(
+                            task_data, "No task found"),
+                        status=status.HTTP_201_CREATED)
+                if len(task_data) == 1:
                     task_data[0].pop("is_active")
                     task_data[0].pop("is_delete")
                     return Response(
                         ResponseData.success(
                             task_data[0], "Task details fetched successfully"),
                         status=status.HTTP_201_CREATED)
-            else:
+                for i,ele in enumerate(task_data):
+                    ele.pop("is_active")
+                    ele.pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        task_data, "Task details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+            elif(date != "" and isCompleted is not None):
+                task_data = list(
+                    TaskModel.objects.values().filter(user_id=user_id,created_at = date,isCompleted = isCompleted))
+                if len(task_data) == 0:
+                    return Response(
+                        ResponseData.success(
+                            task_data, "No task found"),
+                        status=status.HTTP_201_CREATED)
+                if len(task_data) == 1:
+                    task_data[0].pop("is_active")
+                    task_data[0].pop("is_delete")
+                    return Response(
+                        ResponseData.success(
+                            task_data[0], "Task details fetched successfully"),
+                        status=status.HTTP_201_CREATED)
+                for i,ele in enumerate(task_data):
+                    ele.pop("is_active")
+                    ele.pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        task_data, "Task details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+            elif(date == "" and isCompleted is not None):
+                task_data = list(
+                    TaskModel.objects.values().filter(user_id=user_id,isCompleted = isCompleted))
+                if len(task_data) == 0:
+                    return Response(
+                        ResponseData.success(
+                            task_data, "No task found"),
+                        status=status.HTTP_201_CREATED)
+                if len(task_data) == 1:
+                    task_data[0].pop("is_active")
+                    task_data[0].pop("is_delete")
+                    return Response(
+                        ResponseData.success(
+                            task_data[0], "Task details fetched successfully"),
+                        status=status.HTTP_201_CREATED)
+                for i,ele in enumerate(task_data):
+                    ele.pop("is_active")
+                    ele.pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        task_data, "Task details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+            elif(date == "" and isCompleted is None):
                 task_data = list(
                     TaskModel.objects.values().filter(user_id=user_id))
                 if len(task_data) == 0:

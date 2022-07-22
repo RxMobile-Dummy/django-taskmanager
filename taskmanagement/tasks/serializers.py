@@ -10,7 +10,7 @@ class AddTaskSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = TaskModel
         exclude = ["created_at", "updated_at", "is_active",
-                   "is_delete", "task_status", "user_id"]
+                   "is_delete", "isCompleted", "user_id"]
 
 
 class UpdateTaskSerializer(serializers.ModelSerializer):
@@ -36,13 +36,13 @@ class DeleteTaskSerializer(serializers.ModelSerializer):
 
 class GetTaskSerializer(serializers.ModelSerializer):
     """Serializer for getting task"""
-    id = serializers.IntegerField(default=None)
-    project_id = serializers.CharField(max_length=50,default=None)
+    # id = serializers.IntegerField(default=None)
+    # project_id = serializers.CharField(max_length=50,default=None)
 
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = TaskModel
-        fields = ['project_id', 'id']
+        fields = ["isCompleted"]
 
 
 class AddTaskStatusSerializer(serializers.ModelSerializer):
@@ -60,7 +60,7 @@ class GetTaskStatusSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = TaskStatusModel
-        exclude = ["task_status", "created_at",
+        exclude = ["isCompleted", "created_at",
                    "updated_at", "is_active", "is_delete"]
 
 
@@ -81,5 +81,5 @@ class DeleteTaskStatusSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = TaskStatusModel
-        exclude = ["task_status", "created_at",
+        exclude = ["isCompleted", "created_at",
                    "updated_at", "is_active", "is_delete"]
