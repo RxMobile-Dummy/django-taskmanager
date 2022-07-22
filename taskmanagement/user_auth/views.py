@@ -19,6 +19,7 @@ from .serializers import ResetPasswordSerializer, SignInSerializer, UpdateUserRo
 from .serializers import UpdateUserStatusSerializer, UserSerializer, UserUpdateProfileSerializer
 from .models import UserModel, UserRoleModel, UserStatusModel
 from .authentication import Authentication
+from django.core.files.storage import FileSystemStorage
 
 
 # Create your views here.
@@ -40,6 +41,12 @@ def signup(request):
             mobile_number = serializer.data["mobile_number"]
             email = UserModel.objects.filter(email=email_id).first()
             role_data = UserRoleModel.objects.filter(id=role).first()
+            profile_pic = request.FILES['profile_pic'] if 'profile_pic' in request.FILES else ""
+            profile_pic_path = []
+            if profile_pic!="":
+                 fs = FileSystemStorage(location='static/')
+                 fs.save(profile_pic.name, profile_pic)
+            print("profile_pic_path")
             if not role_data:
                 return Response(
                     ResponseData.error("Role id is not valid"),
@@ -64,6 +71,7 @@ def signup(request):
                 user_status_id = user_status_data.id
             new_user = UserModel.objects.create(
                 first_name=first_name,
+                profile_pic= "" if profile_pic is "" else f"static/{profile_pic}",
                 last_name=last_name,
                 email=email_id,
                 mobile_number=mobile_number,
@@ -292,6 +300,8 @@ def update_profile(request):
                     ResponseData.error("Status id is not valid"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
+            if 'profile_pic' in request.FILES:
+                userdata.profile_pic = f"static/{request.FILES['profile_pic']}",
             userdata.first_name = serializer.data["first_name"]
             userdata.last_name = serializer.data["last_name"]
             userdata.email_id = serializer.data["email"]
