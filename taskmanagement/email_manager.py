@@ -6,44 +6,30 @@ from multiprocessing import AuthenticationError
 import smtplib
 from jinja2 import Environment
 
+from email.message import EmailMessage
 from projects.models import ProjectAssigneeModel  # Jinja2 templating
 
 CHARSET = "UTF-8"
-
-PORT = 25
-PASSWORD = "Radixweb@13"
-SMTP_SERVER = "192.168.100.101"
 SENDER_EMAIL = "anirudh.chawla@radixweb.com"
-
 
 class EmailManager:
     """Class for managing email"""
-    server = smtplib.SMTP(SMTP_SERVER, PORT)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-
-    def __init__(self) -> None:
-        try:
-            self.server.login(SENDER_EMAIL, PASSWORD)
-        except Exception as exception:
-            logging.debug(exception)
 
     def send_email(self, recipient, subject, project_id, assignee_id,template):
         """Function for sending email"""
         try:
-            body = MIMEText(
-                Environment().from_string(template).render(
+            message = EmailMessage()
+            message.add_alternative(Environment().from_string(template).render(
                     title='Hello World!'
-                ), "html"
-            )
-            message = MIMEMultipart("alternative")
+                ))
+            # message = MIMEMultipart("alternative")
             message["Subject"] = subject
             message["From"] = SENDER_EMAIL
             message["To"] = recipient
-            # body = MIMEText(content,"html")
-            message.attach(body)
-            self.server.sendmail(SENDER_EMAIL, recipient, message.as_string())
+            s = smtplib.SMTP('localhost')
+            s.send_message(message)
+            s.quit()
+
             return {
                 "message": "Email has been sent successfully on your email address",
                 "status": True
@@ -58,18 +44,18 @@ class EmailManager:
     def forgot_password(self, recipient, subject,template):
         """Function for sending otp on email if user forgets password"""
         try:
-            body = MIMEText(
-                Environment().from_string(template).render(
+            message = EmailMessage()
+            message.add_alternative(Environment().from_string(template).render(
                     title='Hello World!'
-                ), "html"
-            )
-            message = MIMEMultipart("alternative")
+                ))
+            # message = MIMEMultipart("alternative")
             message["Subject"] = subject
             message["From"] = SENDER_EMAIL
             message["To"] = recipient
+            s = smtplib.SMTP('localhost')
+            s.send_message(message)
+            s.quit()
             # body = MIMEText(content,"html")
-            message.attach(body)
-            self.server.sendmail(SENDER_EMAIL, recipient, message.as_string())
             return {
                 "message": "OTP has been sent successfully on your email address",
                 "status": True
