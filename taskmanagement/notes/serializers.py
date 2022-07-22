@@ -30,14 +30,14 @@ class DeleteNoteSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = NotesModel
-        fields = ['project_id', 'task_id', 'id']
+        fields = ['id']
 
 
 class GetNoteSerializer(serializers.ModelSerializer):
     """Serializers for getting notes"""
-    id = serializers.IntegerField(default=None)
+    # id = serializers.IntegerField(default=None)
 
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = NotesModel
-        fields = ['project_id', 'task_id', 'id']
+        fields = []

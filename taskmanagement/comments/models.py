@@ -1,6 +1,9 @@
 """Comments Models"""
 from datetime import datetime
+from coreapi import Field
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
+from django.forms import FileField
 
 
 # Create your models here.
@@ -8,10 +11,11 @@ class CommentModel(models.Model):
     """Model for comments module."""
     user_id = models.CharField(max_length=50)
     comment_user_id = models.CharField(max_length=50)
-    task_id = models.CharField(max_length=50)
+    # task_id = models.CharField(max_length=50,blank=True)
     description = models.CharField(max_length=300, default="", blank=True)
     created_at = models.DateTimeField(default=datetime.now(), blank=True)
     updated_at = models.DateTimeField(default=datetime.now(), blank=True)
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
+    files = ArrayField(models.FileField(max_length=200,blank=True),blank=True,default=[],max_length=5)

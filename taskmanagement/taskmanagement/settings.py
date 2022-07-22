@@ -12,10 +12,12 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+from taskmanagement.config import Config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-DEFAULT_PORT = "8080"
+DEFAULT_PORT = Config.DEFAULT_PORT
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -23,9 +25,9 @@ DEFAULT_PORT = "8080"
 SECRET_KEY = 'django-insecure--_t)&hwjzixaj$$83hve-$ck0ab=#ohre4_5@$g7d=#39@egwo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = Config.DEBUG
 
-ALLOWED_HOSTS = ['f6de-180-211-112-179.in.ngrok.io', "127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -88,36 +90,36 @@ WSGI_APPLICATION = 'taskmanagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': Config.DB_NAME,
+        'USER': Config.DB_USER,
+        'PASSWORD': Config.DB_PASSWORD,
+        'HOST': Config.DB_HOST,
+        'PORT': Config.DB_PORT,
+    }
+}
+
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'taskmanagementdemo',
-#         'USER': 'postgres',
-#         'PASSWORD': '',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
+
+# 'default': {
+
+# 'ENGINE': 'django.db.backends.postgresql',
+
+# 'NAME': 'akash_kareliya',
+
+# 'USER': 'akash_kareliya',
+
+# 'PASSWORD': 'deep70',
+
+# 'HOST': 'localhost',
+
+# 'PORT': '',
+
 # }
 
-DATABASES = {
-
-'default': {
-
-'ENGINE': 'django.db.backends.postgresql',
-
-'NAME': 'akash_kareliya',
-
-'USER': 'akash_kareliya',
-
-'PASSWORD': 'deep70',
-
-'HOST': 'localhost',
-
-'PORT': '',
-
-}
-
-}
+# }
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -153,7 +155,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR,'static/'),]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -181,3 +183,4 @@ REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSc
 JWT_TOKEN_EXPIRY = 7   # No. of days
 JWT_ALGORITHM = 'HS256'  # Algorithm specified by JWT
 JWT_UTF = 'utf-8'
+

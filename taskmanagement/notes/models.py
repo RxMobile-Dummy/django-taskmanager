@@ -7,8 +7,6 @@ from django.db import models
 class NotesModel(models.Model):
     """Class for Note model"""
     user_id = models.CharField(max_length=50)
-    project_id = models.CharField(max_length=50, blank=True)
-    task_id = models.CharField(max_length=50, blank=True)
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300, default="", blank=True)
     created_at = models.DateTimeField(default=datetime.now(), blank=True)
