@@ -579,7 +579,7 @@ def add_user_role(request):
 def get_user_role(request):
     """Function to get user role"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetUserRoleSerializer(data=data)
         if serializer.is_valid():
