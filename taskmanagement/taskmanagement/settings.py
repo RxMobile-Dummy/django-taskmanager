@@ -168,7 +168,8 @@ EMAIL_PORT = 465
 EMAIL_HOST_USER = 'anirudhflutter@gmail.com'
 EMAIL_HOST_PASSWORD = 'yxhyhxbnrqstyaek'
 
-REST_FRAMEWORK = {'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
                   'DEFAULT_PERMISSION_CLASSES': (
                       # 'rest_framework.permissions.IsAdminUser',
                   ),

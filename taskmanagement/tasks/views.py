@@ -24,10 +24,14 @@ import datetime
 def add_new_task(request):
     """Function to add new task"""
     try:
-        print("datetime.date.today()")
-        print(datetime.date.today())
         authenticated_user = Authentication().authenticate(request)
         data = request.data
+        start_date = data["start_date"]
+        start_date = str(start_date).split("/")[2] + "-" + str(start_date).split("/")[1] + "-" + str(start_date).split("/")[0]
+        data["start_date"] = start_date
+        end_date = data["end_date"]
+        end_date = str(end_date).split("/")[2] + "-" + str(end_date).split("/")[1] + "-" + str(end_date).split("/")[0]
+        data["end_date"] = end_date
         serializer = AddTaskSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
@@ -40,8 +44,8 @@ def add_new_task(request):
             reviewer_id = serializer.data["reviewer_id"]
             assignee_id = serializer.data["assignee_id"]
             tag_id = serializer.data["tag_id"]
-            start_date = serializer.data["start_date"]
-            end_date = serializer.data["end_date"]
+            start_date = request.data["start_date"] if request.data["start_date"] is not None else ""
+            end_date = request.data["end_date"] if request.data["end_date"] is not None else ""
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response(
@@ -77,11 +81,6 @@ def add_new_task(request):
                     ResponseData.error(
                         "Reviewer and assignee cannot be assigned to same project"),
                     status=status.HTTP_406_NOT_ACCEPTABLE)
-            # task_status_data = TaskStatusModel.objects.filter(
-            #     task_status="Pending").first()
-            # task_status_id = ""
-            # if task_status_data:
-            #     task_status_id = task_status_data.id
             new_task = TaskModel.objects.create(user_id=user_id, project_id=project_id,
             name=name, comment=comment, isCompleted=False,
             description=description, is_private=is_private, priority=priority,
@@ -91,6 +90,10 @@ def add_new_task(request):
             task_data = list(TaskModel.objects.values().filter(id=new_task.id))
             task_data[0].pop("is_active")
             task_data[0].pop("is_delete")
+            start_date = str(task_data[0]["start_date"]).split("-")[2] + "/" + str(task_data[0]["start_date"]).split("-")[1] + "/" + str(task_data[0]["start_date"]).split("-")[0]
+            task_data[0]["start_date"] = start_date
+            end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
+            task_data[0]["end_date"] = end_date
             return Response(
                 ResponseData.success(task_data[0], "Task added successfully"),
                 status=status.HTTP_201_CREATED)
@@ -107,6 +110,12 @@ def update_task(request):
     try:
         authenticated_user = Authentication().authenticate(request)
         data = request.data
+        start_date = data["start_date"]
+        start_date = str(start_date).split("/")[2] + "-" + str(start_date).split("/")[1] + "-" + str(start_date).split("/")[0]
+        data["start_date"] = start_date
+        end_date = data["end_date"]
+        end_date = str(end_date).split("/")[2] + "-" + str(end_date).split("/")[1] + "-" + str(end_date).split("/")[0]
+        data["end_date"] = end_date
         serializer = UpdateTaskSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
@@ -176,6 +185,10 @@ def update_task(request):
             task_data = list(TaskModel.objects.values().filter(id=task.id))
             task_data[0].pop("is_active")
             task_data[0].pop("is_delete")
+            start_date = str(task_data[0]["start_date"]).split("-")[2] + "/" + str(task_data[0]["start_date"]).split("-")[1] + "/" + str(task_data[0]["start_date"]).split("-")[0]
+            task_data[0]["start_date"] = start_date
+            end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
+            task_data[0]["end_date"] = end_date
             return Response(
                 ResponseData.success(
                     task_data[0], "Task details updated successfully"),
@@ -232,7 +245,7 @@ def get_task(request):
             if(date !=""):
                 print('str(date).split("/",2)')
                 print(str(date).split("/")[2])
-                date = str(date).split("/")[2] + "-" + str(date).split("/")[1] + "-" + str(date).split("/")[0] + "T00:00:00Z"
+                date = str(date).split("/")[2] + "-" + str(date).split("/")[1] + "-" + str(date).split("/")[0]
             isCompleted = serializer.data["isCompleted"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
@@ -241,7 +254,7 @@ def get_task(request):
                     status=status.HTTP_406_NOT_ACCEPTABLE)
             elif(date != "" and isCompleted is None):
                 task_data = list(
-                    TaskModel.objects.values().filter(user_id=user_id,created_at = date))
+                    TaskModel.objects.values().filter(user_id=user_id,start_date = date))
                 if len(task_data) == 0:
                     return Response(
                         ResponseData.success(
@@ -250,6 +263,10 @@ def get_task(request):
                 if len(task_data) == 1:
                     task_data[0].pop("is_active")
                     task_data[0].pop("is_delete")
+                    start_date = str(task_data[0]["start_date"]).split("-")[2] + "/" + str(task_data[0]["start_date"]).split("-")[1] + "/" + str(task_data[0]["start_date"]).split("-")[0]
+                    task_data[0]["start_date"] = start_date
+                    end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
+                    task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
                             task_data[0], "Task details fetched successfully"),
@@ -257,13 +274,17 @@ def get_task(request):
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
                     ele.pop("is_delete")
+                    start_date = str(ele["start_date"]).split("-")[2] + "/" + str(ele["start_date"]).split("-")[1] + "/" + str(ele["start_date"]).split("-")[0]
+                    ele["start_date"] = start_date
+                    end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
+                    ele["end_date"] = end_date
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
                     status=status.HTTP_201_CREATED)
             elif(date != "" and isCompleted is not None):
                 task_data = list(
-                    TaskModel.objects.values().filter(user_id=user_id,created_at = date,isCompleted = isCompleted))
+                    TaskModel.objects.values().filter(user_id=user_id,start_date = date,isCompleted = isCompleted))
                 if len(task_data) == 0:
                     return Response(
                         ResponseData.success(
@@ -272,6 +293,10 @@ def get_task(request):
                 if len(task_data) == 1:
                     task_data[0].pop("is_active")
                     task_data[0].pop("is_delete")
+                    start_date = str(task_data[0]["start_date"]).split("-")[2] + "/" + str(task_data[0]["start_date"]).split("-")[1] + "/" + str(task_data[0]["start_date"]).split("-")[0]
+                    task_data[0]["start_date"] = start_date
+                    end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
+                    task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
                             task_data[0], "Task details fetched successfully"),
@@ -279,6 +304,10 @@ def get_task(request):
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
                     ele.pop("is_delete")
+                    start_date = str(ele["start_date"]).split("-")[2] + "/" + str(ele["start_date"]).split("-")[1] + "/" + str(ele["start_date"]).split("-")[0]
+                    ele["start_date"] = start_date
+                    end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
+                    ele["end_date"] = end_date
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -294,6 +323,10 @@ def get_task(request):
                 if len(task_data) == 1:
                     task_data[0].pop("is_active")
                     task_data[0].pop("is_delete")
+                    start_date = str(task_data[0]["start_date"]).split("-")[2] + "/" + str(task_data[0]["start_date"]).split("-")[1] + "/" + str(task_data[0]["start_date"]).split("-")[0]
+                    task_data[0]["start_date"] = start_date
+                    end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
+                    task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
                             task_data[0], "Task details fetched successfully"),
@@ -301,6 +334,10 @@ def get_task(request):
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
                     ele.pop("is_delete")
+                    start_date = str(ele["start_date"]).split("-")[2] + "/" + str(ele["start_date"]).split("-")[1] + "/" + str(ele["start_date"]).split("-")[0]
+                    ele["start_date"] = start_date
+                    end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
+                    ele["end_date"] = end_date
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -316,6 +353,10 @@ def get_task(request):
                 if len(task_data) == 1:
                     task_data[0].pop("is_active")
                     task_data[0].pop("is_delete")
+                    start_date = str(task_data[0]["start_date"]).split("-")[2] + "/" + str(task_data[0]["start_date"]).split("-")[1] + "/" + str(task_data[0]["start_date"]).split("-")[0]
+                    task_data[0]["start_date"] = start_date
+                    end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
+                    task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
                             task_data[0], "Task details fetched successfully"),
@@ -323,6 +364,10 @@ def get_task(request):
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
                     ele.pop("is_delete")
+                    start_date = str(ele["start_date"]).split("-")[2] + "/" + str(ele["start_date"]).split("-")[1] + "/" + str(ele["start_date"]).split("-")[0]
+                    ele["start_date"] = start_date
+                    end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
+                    ele["end_date"] = end_date
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
