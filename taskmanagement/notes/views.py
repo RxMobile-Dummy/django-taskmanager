@@ -1,11 +1,8 @@
 """Apis for note module"""
-from multiprocessing import AuthenticationError
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from projects.models import ProjectModel
-from tasks.models import TaskModel
 from user_auth.authentication import Authentication
 from response import Response as ResponseData
 from notes.models import NotesModel
@@ -139,7 +136,7 @@ def delete_note(request):
                     status=status.HTTP_201_CREATED)
             if not note:
                 return Response(
-                    ResponseData.error("Note does not exists"),
+                    ResponseData.success([],"No note found"),
                     status=status.HTTP_201_CREATED)
             NotesModel.objects.filter(
                 id=note_id).delete()
@@ -195,8 +192,8 @@ def get_note(request):
             notedata = NotesModel.objects.filter(user_id=user_id).first()
             if not notedata:
                 return Response(
-                    ResponseData.error(
-                        "Note id does not exists or is invalid"),
+                    ResponseData.success([],
+                        "No data found"),
                     status=status.HTTP_406_NOT_ACCEPTABLE)
             else:
                 print("called")

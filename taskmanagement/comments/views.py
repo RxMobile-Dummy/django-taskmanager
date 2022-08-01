@@ -131,8 +131,13 @@ def update_comment(request):
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             else:
+                files_path = []
                 if(len(files) > 0):
-                    comment_data.files = files
+                    for f in files:
+                       fs = FileSystemStorage(location='static/')
+                       files_path.append(f"static/{f.name}")
+                       fs.save(f, f)
+                    comment_data.files = files_path
                 comment_data.description = description
                 comment_data.save()
                 comments = list(
@@ -244,7 +249,7 @@ def getcomments(request):
                     comment_data[0].update({"user_data" : (user_data_copy[0])})
                     return Response(
                         ResponseData.success(
-                            comment_data[0], "Comment details fetched successfully"),
+                            comment_data, "Comment details fetched successfully"),
                         status=status.HTTP_201_CREATED,
                     )
                 for i in range(0,len(comment_data)):
@@ -285,7 +290,7 @@ def getcomments(request):
                 comment_data[0].pop("is_delete")
                 return Response(
                     ResponseData.success(
-                        comment_data[0], "Comment details fetched successfully"),
+                        comment_data, "Comment details fetched successfully"),
                     status=status.HTTP_201_CREATED,
                 )
         return Response(

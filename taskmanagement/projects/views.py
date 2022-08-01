@@ -124,7 +124,7 @@ def get_project(request):
                 )
                 if not project_data:
                     return Response(
-                        ResponseData.error("No projects found"),
+                        ResponseData.success([],"No projects found"),
                         status=status.HTTP_406_NOT_ACCEPTABLE,
                     )
                 if len(project_data) == 1:
@@ -270,7 +270,7 @@ def get_all_projects(request):
                 ProjectModel.objects.values().filter(user_id=user_id))
             if not project_data:
                 return Response(
-                    ResponseData.error("No projects found"),
+                    ResponseData.success([],"No projects found"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             for i,ele in enumerate(project_data):
@@ -389,7 +389,7 @@ def get_project_status(request):
                 project_status_data = list(ProjectStatusModel.objects.values())
                 if not project_status_data:
                     return Response(
-                        ResponseData.error("No project status found"),
+                        ResponseData.success([],"No project status found"),
                         status=status.HTTP_406_NOT_ACCEPTABLE,
                     )
                 if len(project_status_data) == 1:
@@ -545,7 +545,7 @@ def add_project_assignee(request):
             project_data = ProjectModel.objects.filter(id=project_id).first()
             if not project_data:
                 return Response(
-                    ResponseData.error("Project does not exists"),
+                    ResponseData.success([],"Project does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             if len(assignee_ids) != 0:
@@ -614,7 +614,7 @@ def delete_project_assignee(request):
             project_data = ProjectModel.objects.filter(id=project_id).first()
             if not project_data:
                 return Response(
-                    ResponseData.error("Project does not exists"),
+                    ResponseData.success([],"Project does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             if len(assignee_ids) != 0:
@@ -662,7 +662,7 @@ def get_project_assignees(request):
                 ProjectModel.objects.values().filter(id=project_id))
             if not project_data:
                 return Response(
-                    ResponseData.error("Project does not exists"),
+                    ResponseData.success([],"Project does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             project_assignee_data = list(
@@ -717,7 +717,7 @@ def invite_project_assignees(request):
                 )
             if not project_data:
                 return Response(
-                    ResponseData.error("Project does not exists"),
+                    ResponseData.success([],"Project does not exists"),
                     status=status.HTTP_406_NOT_ACCEPTABLE,
                 )
             if len(assignee_ids) != 0:
@@ -767,7 +767,7 @@ def invite_project_assignees(request):
 </html>
 '''.format(project_id,assignee_data.id)
                     return Response(
-                        EmailManager().send_email(
+                        EmailManager().sendEmail(
                             assignee_data.email,
                             "Get project access",
                             int(project_id),

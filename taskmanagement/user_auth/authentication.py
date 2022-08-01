@@ -5,6 +5,7 @@ from rest_framework import exceptions
 from jwt_utility import JWTUtility
 from .models import UserModel
 from response import Response as ResponseData
+import jwt
 
 
 class Authentication(authentication.BaseAuthentication):

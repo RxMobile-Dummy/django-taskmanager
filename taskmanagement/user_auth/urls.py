@@ -28,4 +28,5 @@ urlpatterns = [
          name="delete_user_status"),
     path('get_user_status/', views.get_user_status, name="get_user_status"),
     path('refresh_token/', views.refresh_token, name="refresh_token"),
+    path('logout/', views.logout, name="logout"),
 ]

@@ -20,6 +20,7 @@ from .serializers import UpdateUserStatusSerializer, UserSerializer, UserUpdateP
 from .models import UserModel, UserRoleModel, UserStatusModel
 from .authentication import Authentication
 from django.core.files.storage import FileSystemStorage
+from taskmanagement import settings
 
 
 # Create your views here.
@@ -45,7 +46,6 @@ def signup(request):
             if profile_pic!="":
                  fs = FileSystemStorage(location='static/')
                  fs.save(profile_pic.name, profile_pic)
-            print("profile_pic_path")
             if not role_data:
                 return Response(
                     ResponseData.error("Role id is not valid"),
@@ -181,7 +181,7 @@ def forgot_password(request):
                             "Forgot Password",
                             template
                         ),
-            return Response(ResponseData.success_without_data("OTP has been sent successfully on your email address"),status=status.HTTP_400_BAD_REQUEST)
+            return Response(ResponseData.success_without_data("OTP has been sent successfully on your email address"),status=status.HTTP_200_OK)
         return Response(
             ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST
         )
@@ -204,29 +204,30 @@ def reset_password(request):
                 password_validation.validate_password(
                     serializer.data["password"])
             userdata = UserModel.objects.filter(
-                password=serializer.data["password"]).first()
-            if not userdata:
-                return Response(
-                    {"success": False, "message": "Account does not exists"},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-            keygen = generateKey()
-            key = base64.b32encode(keygen.returnValue(userdata.email).encode())  # Generating Key
-            OTP = pyotp.HOTP(key)  # HOTP Model
-            print(OTP.at(0))
-            print(userdata.email)
-            if OTP.verify(data["otp"], 0): 
-              userdata.password = serializer.data["password"]
-              userdata.save() # Verifying the OTP
-              return Response(
+                email=serializer.data["email"]).first()
+            # if not userdata:
+            #     return Response(
+            #         {"success": False, "message": "Account does not exists"},
+            #         status=status.HTTP_404_NOT_FOUND,
+            #     )
+            # keygen = generateKey()
+            # key = base64.b32encode(keygen.returnValue(userdata.email).encode())  # Generating Key
+            # OTP = pyotp.HOTP(key)  # HOTP Model
+            # print(OTP.at(0))
+            # print(userdata.email)
+            # if OTP.verify(data["otp"], 0): 
+            userdata.email = serializer.data["email"]
+            userdata.password = serializer.data["password"]
+            userdata.save() # Verifying the OTP
+            return Response(
                     ResponseData.success_without_data(
                         "Password changed successfully"),
                     status=status.HTTP_200_OK,
                 )
-            else:
-                return Response(
-            ResponseData.error("Invalid otp"), status=status.HTTP_400_BAD_REQUEST
-        )
+        #     else:
+        #         return Response(
+        #     ResponseData.error("Invalid otp"), status=status.HTTP_400_BAD_REQUEST
+        # )
         return Response(
             ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST
         )
@@ -837,6 +838,30 @@ def refresh_token(request):
             ResponseData.error(serializer.errors),
             status=status.HTTP_400_BAD_REQUEST,
         )
+    except Exception as error:
+        return Response(
+            ResponseData.error(str(error)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+@swagger_auto_schema(method="POST")
+@api_view(["POST"])
+def logout(request):
+    """Function to logout a user and expire the particular token sent by frontend developer"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        # serializer = LogoutUserSerializer(data=data)
+        if authenticated_user is not None:
+            request.headers.get('Authorization').replace("Bearer ", "").delete()
+            return Response(
+                ResponseData.success_without_data(
+                    "Access token generated successfully"),
+                status=status.HTTP_201_CREATED,
+            )
+        # return Response(
+        #     ResponseData.error(serializer.errors),
+        #     status=status.HTTP_400_BAD_REQUEST,
+        # )
     except Exception as error:
         return Response(
             ResponseData.error(str(error)),
