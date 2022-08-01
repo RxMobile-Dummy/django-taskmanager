@@ -46,7 +46,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = UserModel
-        fields = ['password','email']
+        fields = ['password']
 
 
 class UserUpdateProfileSerializer(serializers.ModelSerializer):

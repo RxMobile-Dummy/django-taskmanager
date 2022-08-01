@@ -140,34 +140,64 @@ class EmailManager:
                 "status":False
             }
 
+    # my code
     def forgot_password(self, recipient, subject,template):
         """Function for sending otp on email if user forgets password"""
         try:
-            message = EmailMessage()
-            message.add_alternative(Environment().from_string(template).render(
+            body = MIMEText(
+                Environment().from_string(template).render(
                     title='Hello World!'
-                ))
-            # message = MIMEMultipart("alternative")
+                ), "html"
+            )
+            message = MIMEMultipart("alternative")
             message["Subject"] = subject
             message["From"] = SENDER_EMAIL
             message["To"] = recipient
-            s = smtplib.SMTP('localhost')
-            s.send_message(message)
-            s.quit()
             # body = MIMEText(content,"html")
-            return Response(
-                    ResponseData.success_without_data(
-                        "OTP has been sent successfully on your email address"),
-                    status=status.HTTP_200_OK,
-                )
-            # {
-            #     "message": "OTP has been sent successfully on your email address",
-            #     "status": True
-            # }
+            message.attach(body)
+            self.server.sendmail(SENDER_EMAIL, recipient, message.as_string())
+            
+            return {
+                "message": "OTP has been sent successfully on your email address",
+                "status": True
+            }
         except Exception as exception:
             print(exception)
             return {
                 "message": "Error while sending an email",
                 "status": False
             }
+
+    # Akash sir's code
+    # def forgot_password(self, recipient, subject,template):
+    #     """Function for sending otp on email if user forgets password"""
+    #     try:
+    #         message = EmailMessage()
+    #         message.add_alternative(Environment().from_string(template).render(
+    #                 title='Hello World!'
+    #             ))
+    #         print("scdscds")
+    #         # message = MIMEMultipart("alternative")
+    #         message["Subject"] = subject
+    #         message["From"] = SENDER_EMAIL
+    #         message["To"] = recipient
+    #         s = smtplib.SMTP('localhost')
+    #         s.send_message(message)
+    #         s.quit()
+    #         # body = MIMEText(content,"html")
+    #         return Response(
+    #                 ResponseData.success_without_data(
+    #                     "OTP has been sent successfully on your email address"),
+    #                 status=status.HTTP_200_OK,
+    #             )
+    #         # {
+    #         #     "message": "OTP has been sent successfully on your email address",
+    #         #     "status": True
+    #         # }
+    #     except Exception as exception:
+    #         print(exception)
+    #         return {
+    #             "message": "Error while sending an email",
+    #             "status": False
+    #         }
 

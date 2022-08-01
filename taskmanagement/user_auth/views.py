@@ -2,6 +2,8 @@
 
 import base64
 from datetime import datetime
+import math
+import random
 import pyotp
 from django.http.response import JsonResponse
 from django.contrib.auth import password_validation
@@ -17,7 +19,7 @@ from .serializers import DeleteUserStatusSerializer
 from .serializers import ForgotPasswordSerializer, GetUserRoleSerializer, GetUserStatusSerializer
 from .serializers import ResetPasswordSerializer, SignInSerializer, UpdateUserRoleSerializer
 from .serializers import UpdateUserStatusSerializer, UserSerializer, UserUpdateProfileSerializer
-from .models import UserModel, UserRoleModel, UserStatusModel
+from .models import OtpForPasswordModel, UserModel, UserRoleModel, UserStatusModel
 from .authentication import Authentication
 from django.core.files.storage import FileSystemStorage
 from taskmanagement import settings
@@ -157,13 +159,21 @@ def forgot_password(request):
         serializer = ForgotPasswordSerializer(data=data)
         if serializer.is_valid():
             email = serializer.data["email"]
-            keygen = generateKey()
-            key = base64.b32encode(keygen.returnValue(email).encode())  # Key is generated
-            OTP = pyotp.HOTP(key) 
-            print("OTP")
-            print(OTP.at(0))
-            print(email)
-            mail_subject = "Activation link has been sent to your email id"
+            user_data = UserModel.objects.filter(
+                email=email
+            ).first()
+            if not user_data:
+                return Response(ResponseData.success_without_data("Entered email id does not exists"),status=status.HTTP_200_OK)
+            digits = "0123456789"
+            OTP = ""
+            for i in range(6):
+               OTP += digits[math.floor(random.random() * 10)]
+            otp = list(OTP)
+            if otp[0] == "0":
+                otp[0] = "1"
+                OTP = "" 
+                for i in range(0,len(otp)):
+                  OTP+=otp[i]
             template = '''
 <!DOCTYPE html>
 <html>
@@ -175,12 +185,28 @@ def forgot_password(request):
 
 </body>
 </html>
-'''.format(OTP.at(0))
+'''.format(OTP)
             EmailManager().forgot_password(
                             email,
                             "Forgot Password",
                             template
                         ),
+            user_otp_data = OtpForPasswordModel.objects.filter(
+                user_id=user_data.id
+            ).first()
+            if user_otp_data:
+                new_otp_for_forget_password_table = OtpForPasswordModel.objects.update(
+                user_id = user_data.id,
+                created_at = datetime.now(),
+                otp = OTP
+                )
+            else:
+                new_otp_for_forget_password_table = OtpForPasswordModel.objects.create(
+                user_id = user_data.id,
+                created_at = datetime.now(),
+                otp = OTP
+                )
+                new_otp_for_forget_password_table.save()
             return Response(ResponseData.success_without_data("OTP has been sent successfully on your email address"),status=status.HTTP_200_OK)
         return Response(
             ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST
@@ -200,23 +226,31 @@ def reset_password(request):
         data = request.data
         serializer = ResetPasswordSerializer(data=data)
         if serializer.is_valid():
+            current_date_time = datetime.now()
             if serializer.data["password"] != "":
                 password_validation.validate_password(
                     serializer.data["password"])
+            userotpdata = OtpForPasswordModel.objects.filter(
+                otp=data["otp"]).first()
+            if not userotpdata:
+                return Response(
+                    {"success": False, "message": "OTP entered is invalid"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            fmt = '%Y-%m-%d %H:%M:%S'
+            current_date = datetime.strptime(str(current_date_time).split(".")[0],fmt)
+            otp_generated_date = datetime.strptime(str(userotpdata.created_at).split(".")[0],fmt)
+            diff = current_date - otp_generated_date
+            if diff.seconds > 60 : 
+                OtpForPasswordModel.objects.filter(otp=data["otp"]).delete()
+                return Response(
+                    {"success": False, "message": "OTP entered is expired"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            print(str(current_date_time).split(".")[0])
+            print(str(userotpdata.created_at).split(".")[0])
             userdata = UserModel.objects.filter(
-                email=serializer.data["email"]).first()
-            # if not userdata:
-            #     return Response(
-            #         {"success": False, "message": "Account does not exists"},
-            #         status=status.HTTP_404_NOT_FOUND,
-            #     )
-            # keygen = generateKey()
-            # key = base64.b32encode(keygen.returnValue(userdata.email).encode())  # Generating Key
-            # OTP = pyotp.HOTP(key)  # HOTP Model
-            # print(OTP.at(0))
-            # print(userdata.email)
-            # if OTP.verify(data["otp"], 0): 
-            userdata.email = serializer.data["email"]
+                id=userotpdata.user_id).first()
             userdata.password = serializer.data["password"]
             userdata.save() # Verifying the OTP
             return Response(
@@ -356,10 +390,10 @@ def update_profile(request):
 def add_user_status(request):
     """Function to add user status"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddUserStatusSerializer(data=data)
-        if serializer.is_valid() and authenticated_user:
+        if serializer.is_valid():
             
             user_status = serializer.data["user_status"]
             user_status_data = UserStatusModel.objects.filter(
@@ -552,7 +586,7 @@ def delete_user_status(request):
 def add_user_role(request):
     """Function to add user role"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddUserRoleSerializer(data=data)
         if serializer.is_valid():
