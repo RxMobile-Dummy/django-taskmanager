@@ -13,7 +13,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from response import Response as ResponseData
 from email_manager import EmailManager
-from .serializers import AddUserRoleSerializer, AddUserStatusSerializer, ChangePasswordSerializer, RefreshAuthTokenSerializer
+from .serializers import AddUserRoleSerializer, AddUserStatusSerializer, ChangePasswordSerializer, GetAllUsersSerializer, RefreshAuthTokenSerializer
 from .serializers import DeleteUserRoleSerializer
 from .serializers import DeleteUserStatusSerializer
 from .serializers import ForgotPasswordSerializer, GetUserRoleSerializer, GetUserStatusSerializer
@@ -660,6 +660,7 @@ def get_user_role(request):
                         user_role_data, "User role details fetched successfully"),
                     status=status.HTTP_201_CREATED,
                 )
+                
             user_role_data = UserRoleModel.objects.filter(
                 id=user_role_id).first()
             if not user_role_data:
@@ -901,3 +902,39 @@ def logout(request):
             ResponseData.error(str(error)),
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+@swagger_auto_schema(method='POST', request_body=GetAllUsersSerializer)
+@api_view(["POST"])
+def get_all_users(request):
+    """Function to get all users data"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = GetAllUsersSerializer(data=data)
+        if serializer.is_valid():
+            userdata = UserModel.objects.filter(
+                id=authenticated_user[0].id
+            ).first()
+            assigneesdata = list(
+                UserModel.objects.values().filter())
+            finaldata = []
+            if len(assigneesdata) > 0:
+                 for i in range(0,len(assigneesdata)):
+                     if assigneesdata[i]['id'] != userdata.id:
+                         finaldata.append(assigneesdata[i])
+            if len(finaldata) == 0:
+                return Response(ResponseData.success(
+                        finaldata, "No user found"),
+                    status=status.HTTP_201_CREATED)
+            for i in range(0,len(finaldata)):
+                finaldata[i].pop("is_active")
+                finaldata[i].pop("is_delete")
+                finaldata[i].pop("password")
+            return Response(
+                    ResponseData.success(
+                        finaldata, "User details details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+        return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exception:
+        return Response(ResponseData.error(str(exception)),
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)

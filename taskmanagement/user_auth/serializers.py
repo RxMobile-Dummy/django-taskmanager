@@ -182,3 +182,11 @@ class RefreshAuthTokenSerializer(serializers.ModelSerializer):
 #         """Meta class to change behaviour of model fields"""
 #         model = UserModel
 #         fields = []
+
+class GetAllUsersSerializer(serializers.ModelSerializer):
+    """Serializer for getting user role"""
+
+    class Meta:
+        """Meta class to change behaviour of model fields"""
+        model = UserModel
+        fields = []
