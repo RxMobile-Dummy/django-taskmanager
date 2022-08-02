@@ -22,7 +22,6 @@ from .serializers import UpdateUserStatusSerializer, UserSerializer, UserUpdateP
 from .models import OtpForPasswordModel, UserModel, UserRoleModel, UserStatusModel
 from .authentication import Authentication
 from django.core.files.storage import FileSystemStorage
-from taskmanagement import settings
 
 
 # Create your views here.

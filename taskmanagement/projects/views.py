@@ -749,6 +749,8 @@ def invite_project_assignees(request):
                 assignee_data = UserModel.objects.filter(
                     id=ele).first()
                 if assignee_data:
+                    print(project_id)
+                    print(assignee_data.id)
                     template = '''
 <!DOCTYPE html>
 <html>
@@ -758,7 +760,7 @@ def invite_project_assignees(request):
 
 <p>Click on verify button to get access of the project you have been assigned</p>
 
-<form action="http://127.0.0.1:8080/task_app/index/{0}/{1}/" method="post">
+<form action="http://127.0.0.1:8000/task_app/index/{0}/{1}/" method="post">
 
     <input type="submit" value="Verify" />
 </form>
