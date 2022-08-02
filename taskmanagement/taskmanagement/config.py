@@ -12,3 +12,4 @@ class Config:
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_HOST = os.getenv('DB_HOST')
     DB_PORT = os.getenv('DB_PORT')
+    SENDER_EMAIL = os.getenv('SENDER_EMAIL')

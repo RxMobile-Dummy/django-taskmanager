@@ -10,10 +10,11 @@ from email.message import EmailMessage
 from rest_framework import status
 from response import Response as ResponseData
 from requests import Response
-from projects.models import ProjectAssigneeModel  # Jinja2 templating
+from projects.models import ProjectAssigneeModel
+from taskmanagement.config import Config  # Jinja2 templating
 
 CHARSET = "UTF-8"
-SENDER_EMAIL = "anirudh.chawla@radixweb.com"
+SENDER_EMAIL = Config.SENDER_EMAIL
 
 # class EmailManager:
 #     """Class for managing email"""
