@@ -175,3 +175,18 @@ class RefreshAuthTokenSerializer(serializers.ModelSerializer):
     def get_token(user):
         """Function to get user token"""
         return JWTUtility.encode_refresh_token(user)
+
+# class LogoutUserSerializer(serializers.ModelSerializer):
+#     """Serializer for logging out the user and expiring that particular token"""
+#     class Meta:
+#         """Meta class to change behaviour of model fields"""
+#         model = UserModel
+#         fields = []
+
+class GetAllUsersSerializer(serializers.ModelSerializer):
+    """Serializer for getting user role"""
+
+    class Meta:
+        """Meta class to change behaviour of model fields"""
+        model = UserModel
+        fields = []

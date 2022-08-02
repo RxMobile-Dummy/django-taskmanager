@@ -15,7 +15,7 @@ class JWTUtility:
     """
 
     JWT_TOKEN_EXPIRY = getattr(
-        settings, "JWT_TOKEN_EXPIRY", timedelta(minutes=30))
+        settings, "JWT_TOKEN_EXPIRY", timedelta(seconds=10))
 
     @staticmethod
     def encode_token(User_Model):

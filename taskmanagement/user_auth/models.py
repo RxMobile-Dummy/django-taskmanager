@@ -43,3 +43,9 @@ class UserStatusModel(models.Model):
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
+
+class OtpForPasswordModel(models.Model):
+    """Serializer for user status"""
+    user_id = models.CharField(max_length=40)
+    created_at = models.DateTimeField(default=datetime.now(), blank=True)
+    otp = models.IntegerField(max_length=6)

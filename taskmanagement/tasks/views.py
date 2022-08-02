@@ -217,7 +217,7 @@ def delete_task(request):
                     status=status.HTTP_201_CREATED)
             if not task:
                 return Response(
-                    ResponseData.error("Task does not exists"),
+                    ResponseData.success([],"Task does not exists"),
                     status=status.HTTP_201_CREATED)
             TaskModel.objects.filter(id=task_id).delete()
             return Response(
@@ -269,7 +269,7 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
-                            task_data[0], "Task details fetched successfully"),
+                            task_data, "Task details fetched successfully"),
                         status=status.HTTP_201_CREATED)
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
@@ -299,7 +299,7 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
-                            task_data[0], "Task details fetched successfully"),
+                            task_data, "Task details fetched successfully"),
                         status=status.HTTP_201_CREATED)
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
@@ -329,7 +329,7 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
-                            task_data[0], "Task details fetched successfully"),
+                            task_data, "Task details fetched successfully"),
                         status=status.HTTP_201_CREATED)
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")
@@ -359,7 +359,7 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     return Response(
                         ResponseData.success(
-                            task_data[0], "Task details fetched successfully"),
+                            task_data, "Task details fetched successfully"),
                         status=status.HTTP_201_CREATED)
                 for i,ele in enumerate(task_data):
                     ele.pop("is_active")

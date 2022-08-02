@@ -2,6 +2,8 @@
 
 import base64
 from datetime import datetime
+import math
+import random
 import pyotp
 from django.http.response import JsonResponse
 from django.contrib.auth import password_validation
@@ -11,13 +13,13 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from response import Response as ResponseData
 from email_manager import EmailManager
-from .serializers import AddUserRoleSerializer, AddUserStatusSerializer, ChangePasswordSerializer, RefreshAuthTokenSerializer
+from .serializers import AddUserRoleSerializer, AddUserStatusSerializer, ChangePasswordSerializer, GetAllUsersSerializer, RefreshAuthTokenSerializer
 from .serializers import DeleteUserRoleSerializer
 from .serializers import DeleteUserStatusSerializer
 from .serializers import ForgotPasswordSerializer, GetUserRoleSerializer, GetUserStatusSerializer
 from .serializers import ResetPasswordSerializer, SignInSerializer, UpdateUserRoleSerializer
 from .serializers import UpdateUserStatusSerializer, UserSerializer, UserUpdateProfileSerializer
-from .models import UserModel, UserRoleModel, UserStatusModel
+from .models import OtpForPasswordModel, UserModel, UserRoleModel, UserStatusModel
 from .authentication import Authentication
 from django.core.files.storage import FileSystemStorage
 
@@ -45,7 +47,6 @@ def signup(request):
             if profile_pic!="":
                  fs = FileSystemStorage(location='static/')
                  fs.save(profile_pic.name, profile_pic)
-            print("profile_pic_path")
             if not role_data:
                 return Response(
                     ResponseData.error("Role id is not valid"),
@@ -157,13 +158,21 @@ def forgot_password(request):
         serializer = ForgotPasswordSerializer(data=data)
         if serializer.is_valid():
             email = serializer.data["email"]
-            keygen = generateKey()
-            key = base64.b32encode(keygen.returnValue(email).encode())  # Key is generated
-            OTP = pyotp.HOTP(key) 
-            print("OTP")
-            print(OTP.at(0))
-            print(email)
-            mail_subject = "Activation link has been sent to your email id"
+            user_data = UserModel.objects.filter(
+                email=email
+            ).first()
+            if not user_data:
+                return Response(ResponseData.success_without_data("Entered email id does not exists"),status=status.HTTP_200_OK)
+            digits = "0123456789"
+            OTP = ""
+            for i in range(6):
+               OTP += digits[math.floor(random.random() * 10)]
+            otp = list(OTP)
+            if otp[0] == "0":
+                otp[0] = "1"
+                OTP = "" 
+                for i in range(0,len(otp)):
+                  OTP+=otp[i]
             template = '''
 <!DOCTYPE html>
 <html>
@@ -175,13 +184,29 @@ def forgot_password(request):
 
 </body>
 </html>
-'''.format(OTP.at(0))
+'''.format(OTP)
             EmailManager().forgot_password(
                             email,
                             "Forgot Password",
                             template
                         ),
-            return Response(ResponseData.success_without_data("OTP has been sent successfully on your email address"),status=status.HTTP_400_BAD_REQUEST)
+            user_otp_data = OtpForPasswordModel.objects.filter(
+                user_id=user_data.id
+            ).first()
+            if user_otp_data:
+                new_otp_for_forget_password_table = OtpForPasswordModel.objects.update(
+                user_id = user_data.id,
+                created_at = datetime.now(),
+                otp = OTP
+                )
+            else:
+                new_otp_for_forget_password_table = OtpForPasswordModel.objects.create(
+                user_id = user_data.id,
+                created_at = datetime.now(),
+                otp = OTP
+                )
+                new_otp_for_forget_password_table.save()
+            return Response(ResponseData.success_without_data("OTP has been sent successfully on your email address"),status=status.HTTP_200_OK)
         return Response(
             ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST
         )
@@ -200,33 +225,42 @@ def reset_password(request):
         data = request.data
         serializer = ResetPasswordSerializer(data=data)
         if serializer.is_valid():
+            current_date_time = datetime.now()
             if serializer.data["password"] != "":
                 password_validation.validate_password(
                     serializer.data["password"])
-            userdata = UserModel.objects.filter(
-                password=serializer.data["password"]).first()
-            if not userdata:
+            userotpdata = OtpForPasswordModel.objects.filter(
+                otp=data["otp"]).first()
+            if not userotpdata:
                 return Response(
-                    {"success": False, "message": "Account does not exists"},
+                    {"success": False, "message": "OTP entered is invalid"},
                     status=status.HTTP_404_NOT_FOUND,
                 )
-            keygen = generateKey()
-            key = base64.b32encode(keygen.returnValue(userdata.email).encode())  # Generating Key
-            OTP = pyotp.HOTP(key)  # HOTP Model
-            print(OTP.at(0))
-            print(userdata.email)
-            if OTP.verify(data["otp"], 0): 
-              userdata.password = serializer.data["password"]
-              userdata.save() # Verifying the OTP
-              return Response(
+            fmt = '%Y-%m-%d %H:%M:%S'
+            current_date = datetime.strptime(str(current_date_time).split(".")[0],fmt)
+            otp_generated_date = datetime.strptime(str(userotpdata.created_at).split(".")[0],fmt)
+            diff = current_date - otp_generated_date
+            if diff.seconds > 60 : 
+                OtpForPasswordModel.objects.filter(otp=data["otp"]).delete()
+                return Response(
+                    {"success": False, "message": "OTP entered is expired"},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            print(str(current_date_time).split(".")[0])
+            print(str(userotpdata.created_at).split(".")[0])
+            userdata = UserModel.objects.filter(
+                id=userotpdata.user_id).first()
+            userdata.password = serializer.data["password"]
+            userdata.save() # Verifying the OTP
+            return Response(
                     ResponseData.success_without_data(
                         "Password changed successfully"),
                     status=status.HTTP_200_OK,
                 )
-            else:
-                return Response(
-            ResponseData.error("Invalid otp"), status=status.HTTP_400_BAD_REQUEST
-        )
+        #     else:
+        #         return Response(
+        #     ResponseData.error("Invalid otp"), status=status.HTTP_400_BAD_REQUEST
+        # )
         return Response(
             ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST
         )
@@ -355,10 +389,10 @@ def update_profile(request):
 def add_user_status(request):
     """Function to add user status"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddUserStatusSerializer(data=data)
-        if serializer.is_valid() and authenticated_user:
+        if serializer.is_valid():
             
             user_status = serializer.data["user_status"]
             user_status_data = UserStatusModel.objects.filter(
@@ -551,7 +585,7 @@ def delete_user_status(request):
 def add_user_role(request):
     """Function to add user role"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddUserRoleSerializer(data=data)
         if serializer.is_valid():
@@ -625,6 +659,7 @@ def get_user_role(request):
                         user_role_data, "User role details fetched successfully"),
                     status=status.HTTP_201_CREATED,
                 )
+                
             user_role_data = UserRoleModel.objects.filter(
                 id=user_role_id).first()
             if not user_role_data:
@@ -842,3 +877,63 @@ def refresh_token(request):
             ResponseData.error(str(error)),
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+@swagger_auto_schema(method="POST")
+@api_view(["POST"])
+def logout(request):
+    """Function to logout a user and expire the particular token sent by frontend developer"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        # serializer = LogoutUserSerializer(data=data)
+        if authenticated_user is not None:
+            request.headers.get('Authorization').replace("Bearer ", "").delete()
+            return Response(
+                ResponseData.success_without_data(
+                    "Access token generated successfully"),
+                status=status.HTTP_201_CREATED,
+            )
+        # return Response(
+        #     ResponseData.error(serializer.errors),
+        #     status=status.HTTP_400_BAD_REQUEST,
+        # )
+    except Exception as error:
+        return Response(
+            ResponseData.error(str(error)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+@swagger_auto_schema(method='POST', request_body=GetAllUsersSerializer)
+@api_view(["POST"])
+def get_all_users(request):
+    """Function to get all users data"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = GetAllUsersSerializer(data=data)
+        if serializer.is_valid():
+            userdata = UserModel.objects.filter(
+                id=authenticated_user[0].id
+            ).first()
+            assigneesdata = list(
+                UserModel.objects.values().filter())
+            finaldata = []
+            if len(assigneesdata) > 0:
+                 for i in range(0,len(assigneesdata)):
+                     if assigneesdata[i]['id'] != userdata.id:
+                         finaldata.append(assigneesdata[i])
+            if len(finaldata) == 0:
+                return Response(ResponseData.success(
+                        finaldata, "No user found"),
+                    status=status.HTTP_201_CREATED)
+            for i in range(0,len(finaldata)):
+                finaldata[i].pop("is_active")
+                finaldata[i].pop("is_delete")
+                finaldata[i].pop("password")
+            return Response(
+                    ResponseData.success(
+                        finaldata, "User details details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+        return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exception:
+        return Response(ResponseData.error(str(exception)),
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
