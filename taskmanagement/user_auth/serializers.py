@@ -18,6 +18,11 @@ class UserSerializer(serializers.ModelSerializer):
         """Function for password validation"""
         password_validation.validate_password(value, self.instance)
         return value
+    
+    @staticmethod
+    def get_token(user):
+        """Function to get user token"""
+        return JWTUtility.encode_token(user)
 
 
 class SignInSerializer(serializers.ModelSerializer):
