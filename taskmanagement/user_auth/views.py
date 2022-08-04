@@ -86,6 +86,9 @@ def signup(request):
             user_details[0].pop("is_delete")
             user_details[0].pop("user_id")
             user_details[0].pop("password")
+            user_details.append("authentication_token")
+            user_details[0]["authentication_token"] = serializer.get_token(
+                user_details[0])
             return Response(
                 ResponseData.success(
                     user_details[0], "User created successfully"),
