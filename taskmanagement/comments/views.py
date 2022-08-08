@@ -40,7 +40,7 @@ def add_new_comment(request):
                     ResponseData.error(
                         "You can select max to max 5 files",
                         ),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             for f in files:
                 fs = FileSystemStorage(location='static/')
@@ -53,18 +53,18 @@ def add_new_comment(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if not comment_user:
                 return Response(
                     ResponseData.error("Comment user id does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if user_id == comment_user_id:
                 return Response(
                     ResponseData.error(
                         "User id and comment user id cannot be same"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             print("length")
             print(files_path)
@@ -115,20 +115,20 @@ def update_comment(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             comment = CommentModel.objects.filter(id=comment_id).first()
             if not comment:
                 return Response(
                     ResponseData.error("Comment does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             comment_data = CommentModel.objects.filter(id=comment_id).first()
             if not comment_data:
                 return Response(
                     ResponseData.error(
                         "Comment id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 files_path = []
@@ -228,7 +228,7 @@ def getcomments(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if comment_id is None:
                 comment_data = list(
@@ -240,7 +240,7 @@ def getcomments(request):
                 if not comment_data:
                     return Response(
                         ResponseData.error("No comments found"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 if len(comment_data) == 1:
                     print(comment_data)
@@ -274,7 +274,7 @@ def getcomments(request):
                 return Response(
                     ResponseData.error(
                         "Comment does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 comment_data.append("user_data")

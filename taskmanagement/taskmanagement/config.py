@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from dotenv import dotenv_values
 
-load_dotenv(dotenv_path='.env.dev')
+load_dotenv(dotenv_path='/Users/anirudh.chawla/python_django/task-management-django/taskmanagement/.env.dev')
 
 class Config: 
     DEFAULT_PORT = os.getenv('DEFAULT_PORT')

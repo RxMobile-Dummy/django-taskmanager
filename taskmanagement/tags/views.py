@@ -32,13 +32,13 @@ def addtag(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             task = TaskModel.objects.filter(id=task_id).first()
             if not task:
                 return Response(
                     ResponseData.error("Task does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             new_tag = TagModel.objects.create(
                 user_id=user_id, task_id=task_id, name=name
@@ -79,25 +79,25 @@ def update_tag(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if task_id != "":
                 task_data = TaskModel.objects.filter(id=task_id).first()
                 if not task_data:
                     return Response(
                         ResponseData.error("Task id does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
             tag_data = TagModel.objects.filter(id=tag_id).first()
             if not tag_data:
                 return Response(
                     ResponseData.error("Tag id does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             elif tag_data.name == name:
                 return Response(
                     ResponseData.error("Tag name is same as before"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 tag_data.name = name
@@ -198,7 +198,7 @@ def gettags(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             tag_data = TagModel.objects.filter(
                 id=tag_id, task_id=task_id, user_id=user_id
@@ -206,7 +206,7 @@ def gettags(request):
             if not tag_data:
                 return Response(
                     ResponseData.error("Tag id does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 tags = list(

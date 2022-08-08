@@ -13,10 +13,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserModel
         exclude = ["user_id", "created_at",
                    "updated_at", "is_active", "is_delete", "status_id"]
-
+    
     def validate_password(self, value):
         """Function for password validation"""
         password_validation.validate_password(value, self.instance)
+        print("valuedfdf")
+        print(value)
         return value
     
     @staticmethod

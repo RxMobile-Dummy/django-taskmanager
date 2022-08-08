@@ -31,17 +31,17 @@ def add_new_note(request):
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response(ResponseData.error("User does not exists"),
-                                status=status.HTTP_406_NOT_ACCEPTABLE)
+                                status=status.HTTP_200_OK)
             # if project_id != "":
             #     project = ProjectModel.objects.filter(id=project_id).first()
             #     if not project:
             #         return Response(ResponseData.error("No projects found"),
-            #                         status=status.HTTP_406_NOT_ACCEPTABLE)
+            #                         status=status.HTTP_200_OK)
             # if task_id != "":
             #     assignee = TaskModel.objects.filter(id=task_id).first()
             #     if not assignee:
             #         return Response(ResponseData.error("No task found"),
-            #                         status=status.HTTP_406_NOT_ACCEPTABLE)
+            #                         status=status.HTTP_200_OK)
             new_note = NotesModel.objects.create(user_id=user_id, title=title,
                                                  description=description)
             new_note.save()
@@ -75,7 +75,7 @@ def update_note(request):
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
                 return Response(ResponseData.error("User does not exists"),
-                                status=status.HTTP_406_NOT_ACCEPTABLE)
+                                status=status.HTTP_200_OK)
             # if project_id != "":
             #     project_data = ProjectModel.objects.filter(
             #         id=project_id).first()
@@ -83,20 +83,20 @@ def update_note(request):
             #         return Response(
             #             ResponseData.error(
             #                 "Project id does not exists or is invalid"),
-            #             status=status.HTTP_406_NOT_ACCEPTABLE)
+            #             status=status.HTTP_200_OK)
             # if task_id != "":
             #     task_data = TaskModel.objects.filter(id=task_id).first()
             #     if not task_data:
             #         return Response(
             #             ResponseData.error(
             #                 "Task id does not exists or is invalid"),
-            #             status=status.HTTP_406_NOT_ACCEPTABLE)
+            #             status=status.HTTP_200_OK)
             notes_data = NotesModel.objects.filter(id=note_id).first()
             if not notes_data:
                 return Response(
                     ResponseData.error(
                         "Note id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             else:
                 note = NotesModel.objects.filter(id=note_id).first()
                 note.title = title
@@ -166,7 +166,7 @@ def get_note(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             # if note_id is None:
             #     notedata = list(NotesModel.objects.values().filter(
             #         user_id=user_id,
@@ -174,7 +174,7 @@ def get_note(request):
             #     if not notedata:
             #         return Response(
             #             ResponseData.error("No note found"),
-            #             status=status.HTTP_406_NOT_ACCEPTABLE)
+            #             status=status.HTTP_200_OK)
             #     if len(notedata) == 1:
             #         notedata[0].pop("is_active")
             #         notedata[0].pop("is_delete")
@@ -194,7 +194,7 @@ def get_note(request):
                 return Response(
                     ResponseData.success([],
                         "No data found"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             else:
                 print("called")
                 notedata = list(NotesModel.objects.values().filter(

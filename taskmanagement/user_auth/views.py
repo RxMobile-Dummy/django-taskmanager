@@ -50,18 +50,18 @@ def signup(request):
             if not role_data:
                 return Response(
                     ResponseData.error("Role id is not valid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if email:
                 return Response(
                     ResponseData.error("Email already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             mobile_number_data = UserModel.objects.filter(mobile_number=mobile_number).first()
             if mobile_number_data:
                 return Response(
                     ResponseData.error("Mobile Number already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             user_status_data = UserStatusModel.objects.filter(
                 user_status="Active"
@@ -94,8 +94,11 @@ def signup(request):
                     user_details[0], "User created successfully"),
                 status=status.HTTP_201_CREATED,
             )
+        errors = ""
+        for error in serializer.errors:
+            errors+="'{0}':'{1}'".format(error,serializer.errors[error])
         return Response(
-            ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST
+            ResponseData.error(errors), status=status.HTTP_400_BAD_REQUEST
         )
     except Exception as exception:
         return Response(
@@ -237,7 +240,7 @@ def reset_password(request):
             if not userotpdata:
                 return Response(
                     {"success": False, "message": "OTP entered is invalid"},
-                    status=status.HTTP_404_NOT_FOUND,
+                    status=status.HTTP_200_OK,
                 )
             fmt = '%Y-%m-%d %H:%M:%S'
             current_date = datetime.strptime(str(current_date_time).split(".")[0],fmt)
@@ -247,7 +250,7 @@ def reset_password(request):
                 OtpForPasswordModel.objects.filter(otp=data["otp"]).delete()
                 return Response(
                     {"success": False, "message": "OTP entered is expired"},
-                    status=status.HTTP_404_NOT_FOUND,
+                    status=status.HTTP_200_OK,
                 )
             print(str(current_date_time).split(".")[0])
             print(str(userotpdata.created_at).split(".")[0])
@@ -319,14 +322,14 @@ def update_profile(request):
             if not userdata:
                 return Response(
                     ResponseData.error("Profile does not exists."),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             role = UserRoleModel.objects.filter(
                 id=serializer.data["role"]).first()
             if not role:
                 return Response(
                     ResponseData.error("Role id is not valid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             status_id = UserStatusModel.objects.filter(
                 id=serializer.data["status_id"]
@@ -334,7 +337,7 @@ def update_profile(request):
             if not status_id:
                 return Response(
                     ResponseData.error("Status id is not valid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if 'profile_pic' in request.FILES:
                 fs = FileSystemStorage(location='static/')
@@ -404,7 +407,7 @@ def add_user_status(request):
             if user_status_data:
                 return Response(
                     ResponseData.error("This user status already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             new_user_status = UserStatusModel.objects.create(
                 user_status=user_status)
@@ -463,7 +466,7 @@ def get_user_status(request):
                 return Response(
                     ResponseData.error(
                         "User status id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 user_status_data = list(
@@ -513,13 +516,13 @@ def update_user_status(request):
                     return Response(
                         ResponseData.error(
                             "User status id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 if user_status_data.user_status == user_status:
                     return Response(
                         ResponseData.error(
                             f"The user status name {user_status} already exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 user_status_data.user_status = user_status
                 user_status_data.save()
@@ -537,7 +540,7 @@ def update_user_status(request):
                 return Response(
                     ResponseData.error(
                         "Project status id param cannot be empty"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
         return Response(
             ResponseData.error(serializer.errors),
@@ -604,7 +607,7 @@ def add_user_role(request):
                 roles_data[0].pop("is_delete")
                 return Response(
                     ResponseData.error("This user role already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             new_role = UserRoleModel.objects.create(user_role=user_role)
             new_role.save()
@@ -669,7 +672,7 @@ def get_user_role(request):
                 return Response(
                     ResponseData.error(
                         "User role id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 user_role_data = list(
@@ -712,13 +715,13 @@ def update_user_role(request):
                     return Response(
                         ResponseData.error(
                             "User role id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 if user_role_data.user_role == user_role:
                     return Response(
                         ResponseData.error(
                             f"The user role name {user_role} already exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 user_role_data.user_role = user_role
                 user_role_data.save()
@@ -736,7 +739,7 @@ def update_user_role(request):
                 return Response(
                     ResponseData.error(
                         "Project status id param cannot be empty"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
         return Response(
             ResponseData.error(serializer.errors),
@@ -799,7 +802,7 @@ def change_password(request):
             if not userdata:
                 return Response(
                     ResponseData.error("Credentials are incorrect"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if (
                     serializer.data["new_password"] != ""
