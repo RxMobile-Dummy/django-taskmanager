@@ -59,7 +59,7 @@ def add_new_project(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             status_data = ProjectStatusModel.objects.filter(
                 project_status="Pending"
@@ -74,7 +74,7 @@ def add_new_project(request):
                 return Response(
                     ResponseData.error(
                         "Project with same name already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             new_project = ProjectModel.objects.create(
                 user_id=user_id,
@@ -125,7 +125,7 @@ def get_project(request):
                 if not project_data:
                     return Response(
                         ResponseData.success([],"No projects found"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 if len(project_data) == 1:
                     project_data[0].pop("is_active")
@@ -147,14 +147,14 @@ def get_project(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             project_data = ProjectModel.objects.filter(id=project_id).first()
             if not project_data:
                 return Response(
                     ResponseData.error(
                         "Project id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             project_data = list(
                 ProjectModel.objects.values().filter(id=project_id))
@@ -202,14 +202,14 @@ def update_project(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             project_data = ProjectModel.objects.filter(id=project_id).first()
             if not project_data:
                 return Response(
                     ResponseData.error(
                         "Project id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if serializer.data["status_id"] != "":
                 project_status_data = ProjectStatusModel.objects.filter(
@@ -219,7 +219,7 @@ def update_project(request):
                     return Response(
                         ResponseData.error(
                             "Project status id does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
             project = ProjectModel.objects.filter(id=project_id).first()
             project.name = name
@@ -264,14 +264,14 @@ def get_all_projects(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             project_data = list(
                 ProjectModel.objects.values().filter(user_id=user_id))
             if not project_data:
                 return Response(
                     ResponseData.success([],"No projects found"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             for i,ele in enumerate(project_data):
                 ele.pop("is_active")
@@ -347,7 +347,7 @@ def add_project_status(request):
             if status_data:
                 return Response(
                     ResponseData.error("Project status already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             new_project_status = ProjectStatusModel.objects.create(
                 project_status=project_status
@@ -390,7 +390,7 @@ def get_project_status(request):
                 if not project_status_data:
                     return Response(
                         ResponseData.success([],"No project status found"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 if len(project_status_data) == 1:
                     project_status_data[0].pop("is_active")
@@ -415,7 +415,7 @@ def get_project_status(request):
                 return Response(
                     ResponseData.error(
                         "Project status id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             else:
                 project_status_data = list(
@@ -459,13 +459,13 @@ def update_project_status(request):
                     return Response(
                         ResponseData.error(
                             "Project status id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 if project_status_data.project_status == project_status:
                     return Response(
                         ResponseData.error(
                             f"The project name {project_status} already exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 project_status_data.project_status = project_status
                 project_status_data.save()
@@ -483,7 +483,7 @@ def update_project_status(request):
                 return Response(
                     ResponseData.error(
                         "Project status id param cannot be empty"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
         return Response(
             ResponseData.error(serializer.errors),
@@ -546,7 +546,7 @@ def add_project_assignee(request):
             if not project_data:
                 return Response(
                     ResponseData.success([],"Project does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if len(assignee_ids) != 0:
                 for i,ele in enumerate(assignee_ids):
@@ -556,7 +556,7 @@ def add_project_assignee(request):
                         return Response(
                             ResponseData.error(
                                 f"Assignee with {ele} does not exists"),
-                            status=status.HTTP_406_NOT_ACCEPTABLE,
+                            status=status.HTTP_200_OK,
                         )
 
             for i,ele in enumerate(assignee_ids):
@@ -569,7 +569,7 @@ def add_project_assignee(request):
                     return Response(
                         ResponseData.error(
                             f"Assignee with {ele} already exists in this project"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 project_assignees = ProjectAssigneeModel.objects.create(
                     project_id=project_id, assignee_ids=ele
@@ -615,7 +615,7 @@ def delete_project_assignee(request):
             if not project_data:
                 return Response(
                     ResponseData.success([],"Project does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if len(assignee_ids) != 0:
                 for i,ele in enumerate(assignee_ids):
@@ -625,7 +625,7 @@ def delete_project_assignee(request):
                         return Response(
                             ResponseData.error(
                                 f"Assignee with {ele} does not exists in this project"),
-                            status=status.HTTP_406_NOT_ACCEPTABLE,
+                            status=status.HTTP_200_OK,
                         )
                     ProjectAssigneeModel.objects.filter(
                         assignee_ids=ele
@@ -663,7 +663,7 @@ def get_project_assignees(request):
             if not project_data:
                 return Response(
                     ResponseData.success([],"Project does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             project_assignee_data = list(
                 ProjectAssigneeModel.objects.values().filter(project_id=project_id)
@@ -713,12 +713,12 @@ def invite_project_assignees(request):
             if not userdata:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if not project_data:
                 return Response(
                     ResponseData.success([],"Project does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE,
+                    status=status.HTTP_200_OK,
                 )
             if len(assignee_ids) != 0:
                 for i,ele in enumerate(assignee_ids):
@@ -726,7 +726,7 @@ def invite_project_assignees(request):
                         return Response(
                             ResponseData.error(
                                 "User id and assignee id cannot be same"),
-                            status=status.HTTP_406_NOT_ACCEPTABLE,
+                            status=status.HTTP_200_OK,
                         )
                     user = UserModel.objects.filter(
                         id=int(ele)).first()
@@ -734,7 +734,7 @@ def invite_project_assignees(request):
                         return Response(
                             ResponseData.error(
                                 f"Assignee with {ele} does not exists"),
-                            status=status.HTTP_406_NOT_ACCEPTABLE,
+                            status=status.HTTP_200_OK,
                         )
             for i,ele in enumerate(assignee_ids):
                 existing_project_assignee_data = ProjectAssigneeModel.objects.values().filter(
@@ -744,7 +744,7 @@ def invite_project_assignees(request):
                     return Response(
                         ResponseData.error(
                             f"Assignee with {ele} already exists in this project"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE,
+                        status=status.HTTP_200_OK,
                     )
                 assignee_data = UserModel.objects.filter(
                     id=ele).first()

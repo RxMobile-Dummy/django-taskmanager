@@ -50,37 +50,37 @@ def add_new_task(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             if project_id != "":
                 project = ProjectModel.objects.filter(id=project_id).first()
                 if not project:
                     return Response(
                         ResponseData.error("Project does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
             task_data = TaskModel.objects.filter(
                 project_id=project_id, name=name).first()
             if task_data:
                 return Response(
                     ResponseData.error(
                         "Task with same name exists in this project"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             if assignee_id != "":
                 assignee = UserModel.objects.filter(id=assignee_id).first()
                 if not assignee:
                     return Response(
                         ResponseData.error("Assignee Id does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
             if reviewer_id != "":
                 reviewer = UserModel.objects.filter(id=reviewer_id).first()
                 if not reviewer:
                     return Response(
                         ResponseData.error("Reviewer Id does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
             if reviewer_id == assignee_id is not "":
                 return Response(
                     ResponseData.error(
                         "Reviewer and assignee cannot be assigned to same project"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             new_task = TaskModel.objects.create(user_id=user_id, project_id=project_id,
             name=name, comment=comment, isCompleted=False,
             description=description, is_private=is_private, priority=priority,
@@ -136,7 +136,7 @@ def update_task(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             if project_id != "":
                 project_data = ProjectModel.objects.filter(
                     id=project_id).first()
@@ -144,37 +144,38 @@ def update_task(request):
                     return Response(
                         ResponseData.error(
                             "Project id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
             task_data = TaskModel.objects.filter(id=task_id).first()
             if not task_data:
                 return Response(
                     ResponseData.error(
                         "Task id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             if assignee_id != "":
                 assignee = UserModel.objects.filter(id=assignee_id).first()
                 if not assignee:
                     return Response(
                         ResponseData.error(
                             "Assignee Id does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
             if reviewer_id != "":
                 reviewer = UserModel.objects.filter(id=reviewer_id).first()
                 if not reviewer:
                     return Response(
                         ResponseData.error("Reviewer Id does not exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
             if reviewer_id == assignee_id != "":
                 return Response(
                     ResponseData.error(
                         "Reviewer and assignee cannot be assigned to same project"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             task = TaskModel.objects.filter(id=task_id).first()
             task.name = name
             task.comment = comment
             task.isCompleted = isCompleted
             task.description = description
             task.is_private = is_private
+            task.project_id = project_id
             task.priority = priority
             task.tag_id = tag_id
             task.reviewer_id = reviewer_id
@@ -251,7 +252,7 @@ def get_task(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             elif(date != "" and isCompleted is None):
                 task_data = list(
                     TaskModel.objects.values().filter(user_id=user_id,start_date = date))
@@ -394,7 +395,7 @@ def add_task_status(request):
             if status_data:
                 return Response(
                     ResponseData.error("Task status already exists"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             new_task_status = TaskStatusModel.objects.create(
                 task_status=task_status)
             new_task_status.save()
@@ -450,7 +451,7 @@ def get_task_status(request):
                 return Response(
                     ResponseData.error(
                         "Task status id does not exists or is invalid"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
             else:
                 task_status_data = list(
                     TaskStatusModel.objects.values().filter(id=task_status_id))
@@ -485,12 +486,12 @@ def update_task_status(request):
                     return Response(
                         ResponseData.error(
                             "Task status id does not exists or is invalid"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
                 if task_status_data.task_status == task_status:
                     return Response(
                         ResponseData.error(
                             f"The task name {task_status} already exists"),
-                        status=status.HTTP_406_NOT_ACCEPTABLE)
+                        status=status.HTTP_200_OK)
                 task_status_data.task_status = task_status
                 task_status_data.save()
                 task_status_data = list(
@@ -504,7 +505,7 @@ def update_task_status(request):
             else:
                 return Response(
                     ResponseData.error("Task status id param cannot be empty"),
-                    status=status.HTTP_406_NOT_ACCEPTABLE)
+                    status=status.HTTP_200_OK)
         return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
     except Exception as exception:
         return Response(ResponseData.error(str(exception)),
