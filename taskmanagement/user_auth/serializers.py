@@ -17,8 +17,6 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_password(self, value):
         """Function for password validation"""
         password_validation.validate_password(value, self.instance)
-        print("valuedfdf")
-        print(value)
         return value
     
     @staticmethod
