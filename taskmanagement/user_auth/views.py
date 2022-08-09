@@ -26,7 +26,6 @@ from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 
-
 @swagger_auto_schema(method="POST", request_body=UserSerializer)
 @api_view(["POST"])
 def signup(request):
@@ -94,11 +93,11 @@ def signup(request):
                     user_details[0], "User created successfully"),
                 status=status.HTTP_201_CREATED,
             )
-        errors = ""
         for error in serializer.errors:
-            errors+="'{0}':'{1}'".format(error,serializer.errors[error])
+            print(serializer.errors[error][0])
         return Response(
-            ResponseData.error(errors), status=status.HTTP_400_BAD_REQUEST
+            ResponseData.error(serializer.errors[error][0]),
+            status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as exception:
         return Response(
@@ -826,8 +825,10 @@ def change_password(request):
                 ResponseData.error("Please provide new password value"),
                 status=status.HTTP_201_CREATED,
             )
+        for error in serializer.errors:
+            print(serializer.errors[error][0])
         return Response(
-            ResponseData.error(serializer.errors),
+            ResponseData.error(serializer.errors[error][0]),
             status=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as error:
