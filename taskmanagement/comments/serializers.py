@@ -10,7 +10,7 @@ class AddCommentSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = CommentModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class UpdateCommentSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class UpdateCommentSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = CommentModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class DeleteCommentSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class DeleteCommentSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = CommentModel
-        fields = ['comment_user_id', 'id']
+        fields = ['comment_user', 'id']
 
 
 class GetCommentSerializer(serializers.ModelSerializer):
@@ -41,4 +41,4 @@ class GetCommentSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = CommentModel
-        fields = ['comment_user_id', 'id']
+        fields = ['comment_user', 'id']

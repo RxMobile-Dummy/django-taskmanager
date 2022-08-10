@@ -26,7 +26,7 @@ def addtag(request):
         serializer = AddTagSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
-            task_id = serializer.data["task_id"]
+            task_id = serializer.data["task"]
             name = serializer.data["name"]
             user = UserModel.objects.filter(id=user_id).first()
             if not user:
@@ -47,6 +47,8 @@ def addtag(request):
             tag_data = list(TagModel.objects.values().filter(id=new_tag.id))
             tag_data[0].pop("is_active")
             tag_data[0].pop("is_delete")
+            tag_data[0]['user_id'] = str(tag_data[0]['user_id'])
+            tag_data[0]['task_id'] = str(tag_data[0]['task_id'])
             return Response(
                 ResponseData.success(tag_data[0], "Tag added successfully"),
                 status=status.HTTP_201_CREATED,
@@ -72,7 +74,7 @@ def update_tag(request):
         serializer = UpdateTagSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
-            task_id = serializer.data["task_id"]
+            task_id = serializer.data["task"]
             name = serializer.data["name"]
             tag_id = serializer.data["id"]
             user = UserModel.objects.filter(id=user_id).first()
@@ -105,6 +107,8 @@ def update_tag(request):
                 tag = list(TagModel.objects.values().filter(id=tag_data.id))
                 tag[0].pop("is_active")
                 tag[0].pop("is_delete")
+                tag[0]['user_id'] = str(tag[0]['user_id'])
+                tag[0]['task_id'] = str(tag[0]['task_id'])
                 return Response(
                     ResponseData.success(
                         tag[0], "Tag name updated successfully"),
@@ -180,6 +184,8 @@ def gettags(request):
                 if len(tag_data) == 1:
                     tag_data[0].pop("is_active")
                     tag_data[0].pop("is_delete")
+                    tag_data[0]['user_id'] = str(tag_data[0]['user_id'])
+                    tag_data[0]['task_id'] = str(tag_data[0]['task_id'])
                     return Response(
                         ResponseData.success(
                             tag_data[0], "Tag details fetched successfully"),
@@ -216,6 +222,8 @@ def gettags(request):
                 )
                 tags[0].pop("is_active")
                 tags[0].pop("is_delete")
+                tags[0]['user_id'] = str(tags[0]['user_id'])
+                tags[0]['task_id'] = str(tags[0]['task_id'])
                 return Response(
                     ResponseData.success(
                         tags[0], "Tag details fetched successfully"),

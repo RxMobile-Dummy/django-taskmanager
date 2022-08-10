@@ -4,6 +4,7 @@ import base64
 from datetime import datetime
 import math
 import random
+import django
 import pyotp
 from django.http.response import JsonResponse
 from django.contrib.auth import password_validation
@@ -83,11 +84,11 @@ def signup(request):
                 UserModel.objects.values().filter(id=new_user.id))
             user_details[0].pop("is_active")
             user_details[0].pop("is_delete")
-            user_details[0].pop("user_id")
             user_details[0].pop("password")
             user_details.append("authentication_token")
             user_details[0]["authentication_token"] = serializer.get_token(
                 user_details[0])
+            user_details[0]['status_id'] = str(user_details[0]['status_id'])
             return Response(
                 ResponseData.success(
                     user_details[0], "User created successfully"),
@@ -128,10 +129,11 @@ def signin(request):
             userdata[0].pop("password")
             userdata[0].pop("is_active")
             userdata[0].pop("is_delete")
-            userdata[0].pop("user_id")
             userdata.append("authentication_token")
+            userdata[0]["status_id"] = str(userdata[0]["status_id"])
             userdata[0]["authentication_token"] = serializer.get_token(
                 userdata[0])
+            userdata[0]['status_id'] = str(userdata[0]['status_id'])
             return JsonResponse(
                     ResponseData.success(
                         userdata[0], "User logged in successfully"),
@@ -151,7 +153,7 @@ def signin(request):
 class generateKey:
     @staticmethod
     def returnValue(phone):
-        return str(phone) + str(datetime.date(datetime.now())) + "Some Random Secret Key"
+        return str(phone) + str(datetime.date(django.utils.timezone.now)) + "Some Random Secret Key"
         
 
 @swagger_auto_schema(method="POST", request_body=ForgotPasswordSerializer)
@@ -201,13 +203,13 @@ def forgot_password(request):
             if user_otp_data:
                 new_otp_for_forget_password_table = OtpForPasswordModel.objects.update(
                 user_id = user_data.id,
-                created_at = datetime.now(),
+                created_at = django.utils.timezone.now,
                 otp = OTP
                 )
             else:
                 new_otp_for_forget_password_table = OtpForPasswordModel.objects.create(
                 user_id = user_data.id,
-                created_at = datetime.now(),
+                created_at = django.utils.timezone.now,
                 otp = OTP
                 )
                 new_otp_for_forget_password_table.save()
@@ -230,7 +232,7 @@ def reset_password(request):
         data = request.data
         serializer = ResetPasswordSerializer(data=data)
         if serializer.is_valid():
-            current_date_time = datetime.now()
+            current_date_time = django.utils.timezone.now
             if serializer.data["password"] != "":
                 password_validation.validate_password(
                     serializer.data["password"])
@@ -331,7 +333,7 @@ def update_profile(request):
                     status=status.HTTP_200_OK,
                 )
             status_id = UserStatusModel.objects.filter(
-                id=serializer.data["status_id"]
+                id=serializer.data["status"]
             ).first()
             if not status_id:
                 return Response(
@@ -353,7 +355,7 @@ def update_profile(request):
                 mobile_number=serializer.data["mobile_number"],
                 # password=password,
                 role=serializer.data["role"],
-                status_id=serializer.data["status_id"],
+                status_id=serializer.data["status"],
             )
             else:
                 UserModel.objects.update(
@@ -364,7 +366,7 @@ def update_profile(request):
                 mobile_number=serializer.data["mobile_number"],
                 # password=password,
                 role=serializer.data["role"],
-                status_id=serializer.data["status_id"],
+                status_id=serializer.data["status"],
             )
             updated_date = list(
                 UserModel.objects.values().filter(
@@ -373,6 +375,7 @@ def update_profile(request):
             updated_date[0].pop("password")
             updated_date[0].pop("is_active")
             updated_date[0].pop("is_delete")
+            updated_date[0]['status_id'] = str(updated_date[0]['status_id'])
             return Response(
                 ResponseData.success(
                     updated_date[0], "User profile updated successfully"),
@@ -936,6 +939,7 @@ def get_all_users(request):
                 finaldata[i].pop("is_active")
                 finaldata[i].pop("is_delete")
                 finaldata[i].pop("password")
+                finaldata[i]['status_id'] = str(finaldata[i]['status_id'])
             return Response(
                     ResponseData.success(
                         finaldata, "User details details fetched successfully"),

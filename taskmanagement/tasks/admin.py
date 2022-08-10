@@ -7,15 +7,22 @@ from user_auth.models import UserModel,UserRoleModel,UserStatusModel
 from projects.models import ProjectModel,ProjectAssigneeModel,ProjectStatusModel
 
 # Register your models here.
-admin.site.register(CommentModel)
-admin.site.register(NotesModel)
-admin.site.register(TagModel)
-admin.site.register(TaskModel)
-admin.site.register(TaskStatusModel)
-admin.site.register(UserModel)
-admin.site.register(UserRoleModel)
-admin.site.register(UserStatusModel)
-admin.site.register(ProjectModel)
-admin.site.register(ProjectAssigneeModel)
-admin.site.register(ProjectStatusModel)
+# admin.site.register(CommentModel)
+# admin.site.register(NotesModel)
+# admin.site.register(TagModel)
+@admin.register(TaskModel)
+class TaskAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(TaskStatusModel)
+class TaskStatusAdmin(admin.ModelAdmin):
+    pass
+# admin.site.register(TaskModel)
+# admin.site.register(TaskStatusModel)
+# admin.site.register(UserModel)
+# admin.site.register(UserRoleModel)
+# admin.site.register(UserStatusModel)
+# admin.site.register(ProjectModel)
+# admin.site.register(ProjectAssigneeModel)
+# admin.site.register(ProjectStatusModel)
 

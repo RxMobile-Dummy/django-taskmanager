@@ -91,6 +91,8 @@ def add_new_project(request):
                 ProjectModel.objects.values().filter(id=new_project.id))
             project_data[0].pop("is_active")
             project_data[0].pop("is_delete")
+            project_data[0]['user_id'] = str(project_data[0]['user_id'])
+            project_data[0]['status_id'] = str(project_data[0]['status_id'])
             return Response(
                 ResponseData.success(
                     project_data[0], "Project added successfully"),
@@ -130,12 +132,16 @@ def get_project(request):
                 if len(project_data) == 1:
                     project_data[0].pop("is_active")
                     project_data[0].pop("is_delete")
+                    project_data[0]['user_id'] = str(project_data[0]['user_id'])
+                    project_data[0]['status_id'] = str(project_data[0]['status_id'])
                     return Response(
                         ResponseData.success(
                             project_data[0], "Project details fetched successfully"),
                         status=status.HTTP_201_CREATED,
                     )
                 for i,ele in enumerate(project_data):
+                    project_data[i]['user_id'] = str(project_data[i]['user_id'])
+                    project_data[i]['status_id'] = str(project_data[i]['status_id'])
                     ele.pop("is_active")
                     ele.pop("is_delete")
                 return Response(
@@ -160,6 +166,8 @@ def get_project(request):
                 ProjectModel.objects.values().filter(id=project_id))
             project_data[0].pop("is_active")
             project_data[0].pop("is_delete")
+            project_data[0]['user_id'] = str(project_data[0]['user_id'])
+            project_data[0]['status_id'] = str(project_data[0]['status_id'])
             return Response(
                 ResponseData.success(
                     project_data[0], "Project details fetched successfully"),
@@ -190,8 +198,8 @@ def update_project(request):
             name = serializer.data["name"]
             color = serializer.data["color"]
             project_status_id = (
-                serializer.data["status_id"]
-                if serializer.data["status_id"] != ""
+                serializer.data["status"]
+                if serializer.data["status"] != ""
                 else ""
             )
             description = serializer.data["description"]
@@ -211,7 +219,7 @@ def update_project(request):
                         "Project id does not exists or is invalid"),
                     status=status.HTTP_200_OK,
                 )
-            if serializer.data["status_id"] != "":
+            if serializer.data["status"] != "":
                 project_status_data = ProjectStatusModel.objects.filter(
                     id=project_status_id
                 ).first()
@@ -234,6 +242,8 @@ def update_project(request):
                 ProjectModel.objects.values().filter(id=project.id))
             project_data[0].pop("is_active")
             project_data[0].pop("is_delete")
+            project_data[0]['user_id'] = str(project_data[0]['user_id'])
+            project_data[0]['status_id'] = str(project_data[0]['status_id'])
             return Response(
                 ResponseData.success(
                     project_data[0], "Project details updated successfully"),
@@ -276,6 +286,8 @@ def get_all_projects(request):
             for i,ele in enumerate(project_data):
                 ele.pop("is_active")
                 ele.pop("is_delete")
+                project_data[i]['user_id'] = str(project_data[i]['user_id'])
+                project_data[i]['status_id'] = str(project_data[i]['status_id'])
             return Response(
                 ResponseData.success(
                     project_data, "Project details fetched successfully"),
@@ -539,7 +551,7 @@ def add_project_assignee(request):
         serializer = AddProjectAssigneeSerializer(data=data)
         if serializer.is_valid():
             
-            project_id = serializer.data["project_id"]
+            project_id = serializer.data["project"]
             assignee_ids = serializer.data["assignee_ids"]
             assignee_ids = str(assignee_ids).split(",")
             project_data = ProjectModel.objects.filter(id=project_id).first()
@@ -582,6 +594,8 @@ def add_project_assignee(request):
             )
             project_assignees_data[0].pop("is_active")
             project_assignees_data[0].pop("is_delete")
+            project_assignees_data[0]['project_id'] = str(project_assignees_data[0]['project_id'])
+            project_assignees_data[0]['user_id'] = str(project_assignees_data[0]['user_id'])
             return Response(
                 ResponseData.success(project_assignees_data,
                                      "Project assignees added successfully"),
@@ -608,7 +622,7 @@ def delete_project_assignee(request):
         serializer = DeleteProjectAssigneeSerializer(data=data)
         if serializer.is_valid():
             
-            project_id = serializer.data["project_id"]
+            project_id = serializer.data["project"]
             assignee_ids = serializer.data["assignee_ids"]
             assignee_ids = str(assignee_ids).split(",")
             project_data = ProjectModel.objects.filter(id=project_id).first()
@@ -657,7 +671,7 @@ def get_project_assignees(request):
         serializer = GetProjectAssigneeSerializer(data=data)
         if serializer.is_valid():
             
-            project_id = serializer.data["project_id"]
+            project_id = serializer.data["project"]
             project_data = list(
                 ProjectModel.objects.values().filter(id=project_id))
             if not project_data:
@@ -677,6 +691,8 @@ def get_project_assignees(request):
                 ele.pop("is_active")
                 ele.pop("is_delete")
                 ele.pop("user_id")
+                project_assignee_data[i]['project_id'] = str(project_assignee_data[i]['project_id'])
+                project_assignee_data[i]['user_id'] = str(project_assignee_data[i]['user_id'])
             return Response(
                 ResponseData.success(
                     project_assignee_data, "Project assignee details fetched successfully"),
@@ -702,7 +718,7 @@ def invite_project_assignees(request):
         data = request.data
         serializer = InviteProjectAssigneeSerializer(data=data)
         if serializer.is_valid():
-            project_id = serializer.data["project_id"]
+            project_id = serializer.data["project"]
             assignee_ids = serializer.data["assignee_ids"]
             assignee_ids = str(assignee_ids).split(",")
             user_id = authenticated_user[0].id

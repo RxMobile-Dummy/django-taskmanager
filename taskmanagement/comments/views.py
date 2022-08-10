@@ -30,7 +30,7 @@ def add_new_comment(request):
         serializer = AddCommentSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
-            comment_user_id = serializer.data["comment_user_id"]
+            comment_user_id = serializer.data["comment_user"]
             # task_id = serializer.data["task_id"]
             description = serializer.data["description"]
             files = request.FILES.getlist("files")
@@ -81,6 +81,8 @@ def add_new_comment(request):
                 CommentModel.objects.values().filter(id=new_comment.id))
             comment_data[0].pop("is_active")
             comment_data[0].pop("is_delete")
+            comment_data[0]['user_id'] = str(comment_data[0]['user_id'])
+            comment_data[0]['comment_user_id'] = str(comment_data[0]['comment_user_id'])
             return Response(
                 ResponseData.success(
                     comment_data[0], "Comment added successfully"),
@@ -144,6 +146,8 @@ def update_comment(request):
                     CommentModel.objects.values().filter(id=comment_data.id))
                 comments[0].pop("is_active")
                 comments[0].pop("is_delete")
+                comment_data[0]['user_id'] = str(comment_data[0]['user_id'])
+                comment_data[0]['comment_user_id'] = str(comment_data[0]['comment_user_id'])
                 return Response(
                     ResponseData.success(
                         comments[0], "Comment updated successfully"),
@@ -171,7 +175,7 @@ def delete_comment(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             comment_id = serializer.data["id"]
-            comment_user_id = serializer.data["comment_user_id"]
+            comment_user_id = serializer.data["comment_user"]
             # task_id = serializer.data["task_id"]
             comment = CommentModel.objects.filter(
                 id=comment_id,
@@ -219,7 +223,7 @@ def getcomments(request):
         serializer = GetCommentSerializer(data=data)
         if serializer.is_valid():
             user_id = authenticated_user[0].id
-            comment_user_id = serializer.data["comment_user_id"]
+            comment_user_id = serializer.data["comment_user"]
             comment_id = serializer.data["id"]
             # task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
@@ -246,6 +250,8 @@ def getcomments(request):
                     print(comment_data)
                     comment_data[0].pop("is_active")
                     comment_data[0].pop("is_delete")
+                    comment_data[0]['user_id'] = str(comment_data[0]['user_id'])
+                    comment_data[0]['comment_user_id'] = str(comment_data[0]['comment_user_id'])
                     comment_data[0].update({"user_data" : (user_data_copy[0])})
                     return Response(
                         ResponseData.success(
@@ -257,6 +263,8 @@ def getcomments(request):
                     comment_data[i].update({"user_data" : (user_data_copy[0])})
                     comment_data[i].pop("is_active")
                     comment_data[i].pop("is_delete")
+                    comment_data[i]['user_id'] = str(comment_data[i]['user_id'])
+                    comment_data[i]['comment_user_id'] = str(comment_data[i]['comment_user_id'])
                 print(user_id)                                   
                 return Response(
                     ResponseData.success(
@@ -288,6 +296,8 @@ def getcomments(request):
                 )
                 comment_data[0].pop("is_active")
                 comment_data[0].pop("is_delete")
+                comment_data[0]['user_id'] = str(comment_data[0]['user_id'])
+                comment_data[0]['comment_user_id'] = str(comment_data[0]['comment_user_id'])
                 return Response(
                     ResponseData.success(
                         comment_data, "Comment details fetched successfully"),
