@@ -25,7 +25,7 @@ DEFAULT_PORT = Config.DEFAULT_PORT
 SECRET_KEY = 'django-insecure--_t)&hwjzixaj$$83hve-$ck0ab=#ohre4_5@$g7d=#39@egwo'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 

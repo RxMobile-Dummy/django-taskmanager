@@ -201,9 +201,10 @@ def get_note(request):
                 print("called")
                 notedata = list(NotesModel.objects.values().filter(
                     user_id=user_id))
-                notedata[0].pop("is_active")
-                notedata[0].pop("is_delete")
-                notedata[0]['user_id'] = str(notedata[0]['user_id'])
+                for i in range(0,len(notedata)):
+                    notedata[i].pop("is_active")
+                    notedata[i].pop("is_delete")
+                    notedata[i]['user_id'] = str(notedata[i]['user_id'])
                 return Response(
                     ResponseData.success(
                         notedata, "Note details fetched successfully"),

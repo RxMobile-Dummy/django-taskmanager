@@ -317,6 +317,10 @@ def update_profile(request):
         data = request.data
         serializer = UserUpdateProfileSerializer(data=data)
         if serializer.is_valid() and authenticated_user:
+            first_name = serializer.data["first_name"]
+            last_name = serializer.data["last_name"]
+            # role = serializer.data["role"] if serializer.data["role"] != "" else 0
+            profile_pic = request.FILES['profile_pic'] if 'profile_pic' in request.FILES else ""
             userdata = UserModel.objects.filter(
                 id=authenticated_user[0].id
             ).first()
@@ -343,31 +347,23 @@ def update_profile(request):
             if 'profile_pic' in request.FILES:
                 fs = FileSystemStorage(location='static/')
                 fs.save(request.FILES['profile_pic'].name, request.FILES['profile_pic'])
-                userdata.profile_pic = f"static/{request.FILES['profile_pic']}",
-            print("userdata.profile_pic")
-            print(userdata.profile_pic)
             if 'profile_pic' in request.FILES:
-               UserModel.objects.update(
-                first_name=serializer.data["first_name"],
-                profile_pic= "" if request.FILES['profile_pic'] is "" else f"static/{request.FILES['profile_pic']}",
-                last_name=serializer.data["last_name"],
-                email=serializer.data["email"],
-                mobile_number=serializer.data["mobile_number"],
-                # password=password,
-                role=serializer.data["role"],
-                status_id=serializer.data["status"],
-            )
+               print("profile_pic")
+               print(serializer.data["role"])
+               userdata.first_name=first_name
+               userdata.profile_pic = f"static/{request.FILES['profile_pic']}"
+               userdata.last_name=last_name
+               userdata.role = serializer.data["role"]
+               userdata.status_id = status_id
+               userdata.save()
+               print("true")
             else:
-                UserModel.objects.update(
-                first_name=serializer.data["first_name"],
-                # profile_pic= "" if request.FILES['profile_pic'] is "" else f"static/{request.FILES['profile_pic']}",
-                last_name=serializer.data["last_name"],
-                email=serializer.data["email"],
-                mobile_number=serializer.data["mobile_number"],
-                # password=password,
-                role=serializer.data["role"],
-                status_id=serializer.data["status"],
-            )
+               userdata.first_name=first_name
+               userdata.last_name=last_name
+               userdata.role = serializer.data["role"]
+               userdata.status_id = status_id
+               userdata.save()
+               print("true")
             updated_date = list(
                 UserModel.objects.values().filter(
                     id=authenticated_user[0].id)
@@ -381,11 +377,15 @@ def update_profile(request):
                     updated_date[0], "User profile updated successfully"),
                 status=status.HTTP_201_CREATED,
             )
+        print("serializer.errors")
+        print(serializer.errors)
         return Response(
             ResponseData.error(serializer.errors),
             status=status.HTTP_400_BAD_REQUEST,
         )
     except KeyError as exception:
+        print("exception")
+        print(exception)
         return Response(
             ResponseData.error(str(exception)),
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,

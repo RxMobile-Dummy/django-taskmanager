@@ -60,12 +60,12 @@ def add_new_comment(request):
                     ResponseData.error("Comment user id does not exists"),
                     status=status.HTTP_200_OK,
                 )
-            if user_id == comment_user_id:
-                return Response(
-                    ResponseData.error(
-                        "User id and comment user id cannot be same"),
-                    status=status.HTTP_200_OK,
-                )
+            # if user_id == comment_user_id:
+            #     return Response(
+            #         ResponseData.error(
+            #             "User id and comment user id cannot be same"),
+            #         status=status.HTTP_200_OK,
+            #     )
             print("length")
             print(files_path)
             new_comment = CommentModel.objects.create(
@@ -146,8 +146,8 @@ def update_comment(request):
                     CommentModel.objects.values().filter(id=comment_data.id))
                 comments[0].pop("is_active")
                 comments[0].pop("is_delete")
-                comment_data[0]['user_id'] = str(comment_data[0]['user_id'])
-                comment_data[0]['comment_user_id'] = str(comment_data[0]['comment_user_id'])
+                comments[0]['user_id'] = str(comments[0]['user_id'])
+                comments[0]['comment_user_id'] = str(comments[0]['comment_user_id'])                
                 return Response(
                     ResponseData.success(
                         comments[0], "Comment updated successfully"),
@@ -227,7 +227,10 @@ def getcomments(request):
             comment_id = serializer.data["id"]
             # task_id = serializer.data["task_id"]
             user = UserModel.objects.filter(id=user_id).first()
+            user.status_id = str(user.status_id)
             user_data_copy = list(UserModel.objects.values().filter(id=user_id))
+            for i in range(0,len(user_data_copy)):
+                user_data_copy[i]["status_id"] = str(user_data_copy[i]["status_id"])
             # user_data_copy[0].pop("profile_pic")
             if not user:
                 return Response(
