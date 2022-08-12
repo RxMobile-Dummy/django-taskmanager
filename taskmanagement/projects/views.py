@@ -238,6 +238,7 @@ def update_project(request):
             project.archive = archive
             project.duration = duration
             project.save()
+            print("updated")
             project_data = list(
                 ProjectModel.objects.values().filter(id=project.id))
             project_data[0].pop("is_active")
@@ -347,7 +348,7 @@ def delete_project(request):
 def add_project_status(request):
     """Function to add project status"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddProjectStatusSerializer(data=data)
         if serializer.is_valid():
@@ -391,7 +392,7 @@ def add_project_status(request):
 def get_project_status(request):
     """Function to get project status"""
     try:
-        authenticated_user = Authentication().authenticate(request)
+        # authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = GetProjectStatusSerializer(data=data)
         if serializer.is_valid():
@@ -785,7 +786,7 @@ def invite_project_assignees(request):
 </html>
 '''.format(project_id,assignee_data.id)
                     return Response(
-                        EmailManager().sendEmail(
+                        EmailManager().send_email(
                             assignee_data.email,
                             "Get project access",
                             int(project_id),

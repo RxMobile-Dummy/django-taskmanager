@@ -15,6 +15,10 @@ from taskmanagement.config import Config  # Jinja2 templating
 
 CHARSET = "UTF-8"
 SENDER_EMAIL = Config.SENDER_EMAIL
+port  = 25
+password = "Radixweb@13"
+smtp_server = "192.168.100.101"
+SENDER_EMAIL="anirudh.chawla@radixweb.com"
 
 class EmailManager:
     """Class for managing email"""

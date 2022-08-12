@@ -21,7 +21,7 @@ class UpdateCommentSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = CommentModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user"]
+                   "is_active", "is_delete", "user",'comment_user']
 
 
 class DeleteCommentSerializer(serializers.ModelSerializer):

@@ -34,6 +34,8 @@ def add_new_task(request):
         data["end_date"] = end_date
         serializer = AddTaskSerializer(data=data)
         if serializer.is_valid():
+            print('serializer.data["reviewer"]')
+            print(serializer.data["reviewer"])
             user_id = authenticated_user[0].id
             project_id = serializer.data["project"]
             name = serializer.data["name"]
@@ -41,8 +43,8 @@ def add_new_task(request):
             description = serializer.data["description"]
             is_private = serializer.data["is_private"]
             priority = serializer.data["priority"]
-            reviewer_id = serializer.data["reviewer"]
-            assignee_id = serializer.data["assignee"]
+            reviewer_id = serializer.data["reviewer"] if serializer.data["reviewer"] is not None else ""
+            assignee_id = serializer.data["assignee"] if serializer.data["assignee"] is not None else ""
             tag_id = serializer.data["tag_id"]
             start_date = request.data["start_date"] if request.data["start_date"] is not None else ""
             end_date = request.data["end_date"] if request.data["end_date"] is not None else ""
@@ -131,8 +133,8 @@ def update_task(request):
             description = serializer.data["description"]
             is_private = serializer.data["is_private"]
             priority = serializer.data["priority"]
-            reviewer_id = serializer.data["reviewer"]
-            assignee_id = serializer.data["assignee"]
+            reviewer_id = serializer.data["reviewer"] if serializer.data["reviewer"] is not None else ""
+            assignee_id = serializer.data["assignee"] if serializer.data["assignee"] is not None else ""
             tag_id = serializer.data["tag_id"]
             start_date = serializer.data["start_date"]
             end_date = serializer.data["end_date"]
@@ -276,8 +278,8 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     task_data[0]['user_id'] = str(task_data[0]['user_id'])
                     task_data[0]['project_id'] = str(task_data[0]['project_id'])
-                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id'])
-                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id'])
+                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
+                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -289,6 +291,11 @@ def get_task(request):
                     ele["start_date"] = start_date
                     end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
                     ele["end_date"] = end_date
+                for i in range(0,len(task_data)):
+                    task_data[i]['user_id'] = str(task_data[i]['user_id'])
+                    task_data[i]['project_id'] = str(task_data[i]['project_id'])
+                    task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
+                    task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -310,8 +317,8 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     task_data[0]['user_id'] = str(task_data[0]['user_id'])
                     task_data[0]['project_id'] = str(task_data[0]['project_id'])
-                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id'])
-                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id'])
+                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
+                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -323,6 +330,11 @@ def get_task(request):
                     ele["start_date"] = start_date
                     end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
                     ele["end_date"] = end_date
+                for i in range(0,len(task_data)):
+                    task_data[i]['user_id'] = str(task_data[i]['user_id'])
+                    task_data[i]['project_id'] = str(task_data[i]['project_id'])
+                    task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
+                    task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -342,6 +354,8 @@ def get_task(request):
                     task_data[0]["start_date"] = start_date
                     end_date = str(task_data[0]["end_date"]).split("-")[2] + "/" + str(task_data[0]["end_date"]).split("-")[1] + "/" + str(task_data[0]["end_date"]).split("-")[0]
                     task_data[0]["end_date"] = end_date
+                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
+                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -353,6 +367,11 @@ def get_task(request):
                     ele["start_date"] = start_date
                     end_date = str(ele["end_date"]).split("-")[2] + "/" + str(ele["end_date"]).split("-")[1] + "/" + str(ele["end_date"]).split("-")[0]
                     ele["end_date"] = end_date
+                for i in range(0,len(task_data)):
+                    task_data[i]['user_id'] = str(task_data[i]['user_id'])
+                    task_data[i]['project_id'] = str(task_data[i]['project_id'])
+                    task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
+                    task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -374,8 +393,8 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     task_data[0]['user_id'] = str(task_data[0]['user_id'])
                     task_data[0]['project_id'] = str(task_data[0]['project_id'])
-                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id'])
-                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id'])
+                    task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
+                    task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -390,8 +409,8 @@ def get_task(request):
                 for i in range(0,len(task_data)):
                     task_data[i]['user_id'] = str(task_data[i]['user_id'])
                     task_data[i]['project_id'] = str(task_data[i]['project_id'])
-                    task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id'])
-                    task_data[i]['assignee_id'] = str(task_data[i]['assignee_id'])
+                    task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
+                    task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),

@@ -47,4 +47,4 @@ urlpatterns = [
     path('json/', Schemaview.without_ui(cache_timeout=0), name='schema-json'),
 ]
 
-# urlpatterns += staticfiles_urlpatterns()
+urlpatterns += staticfiles_urlpatterns()

@@ -60,7 +60,7 @@ class UserUpdateProfileSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = UserModel
         exclude = ["created_at",
-                   "updated_at", "is_active", "is_delete","password"]
+                   "updated_at", "is_active", "is_delete","password","email","mobile_number"]
 
 
 class DeleteProfileSerializer(serializers.ModelSerializer):
