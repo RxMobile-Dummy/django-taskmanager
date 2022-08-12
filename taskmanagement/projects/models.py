@@ -15,6 +15,9 @@ class ProjectStatusModel(models.Model):
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
 
+    def __str__(self):
+         return f"{self.project_status}"
+
 # Create your models here.
 class ProjectModel(models.Model):
     """Class for project model"""
@@ -33,6 +36,9 @@ class ProjectModel(models.Model):
     archive = models.BooleanField(default=False, blank=True)
     objects = models.Manager()
 
+    def __str__(self):
+         return f"{self.name}"
+
 
 class ProjectAssigneeModel(models.Model):
     """Class for project assignee model"""
@@ -45,3 +51,6 @@ class ProjectAssigneeModel(models.Model):
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
+
+    def __str__(self):
+         return f"{self.project}"

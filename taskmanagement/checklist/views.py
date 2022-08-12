@@ -32,6 +32,7 @@ def add_new_checklist(request):
         if serializer.is_valid():
             user_id = authenticated_user[0].id
             title = serializer.initial_data['title']
+            color = serializer.initial_data['color']
             options_for_checklist = serializer.initial_data["options"]
             user = UserModel.objects.filter(id=user_id,email = authenticated_user[0].email,
             mobile_number = authenticated_user[0].mobile_number).first()
@@ -49,6 +50,7 @@ def add_new_checklist(request):
             new_checklist = ChecklistModel.objects.create(
                 user_id=user_id,
                 title=title,
+                color=color
             )
             new_checklist.save()
             print(options_for_checklist)

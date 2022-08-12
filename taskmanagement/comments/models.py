@@ -23,3 +23,8 @@ class CommentModel(models.Model):
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
     files = ArrayField(models.FileField(max_length=200,blank=True),blank=True,default=list,max_length=5)
+
+    def __str__(self):
+         return f"{self.description}"
+
+    

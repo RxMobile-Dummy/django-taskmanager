@@ -20,3 +20,6 @@ class TagModel(models.Model):
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
+
+    def __str__(self):
+         return f"{self.name}"

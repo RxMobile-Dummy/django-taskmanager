@@ -45,7 +45,7 @@ class EmailManager:
         except Exception as exception:
             print(exception)
             return {
-                "message": "Error while sending an email",
+                "error": "Error while sending an email",
                 "status": False
             }
 
