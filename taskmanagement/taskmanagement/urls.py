@@ -40,6 +40,7 @@ urlpatterns = [
     path('task_app/', include("tasks.urls")),
     path('task_app/', include("notes.urls")),
     path('task_app/', include("comments.urls")),
+    path('task_app/', include("checklist.urls")),
     path('', Schemaview.with_ui('swagger', cache_timeout=0),
          name='schema-swagger-ui'),
     path('re_doc/', Schemaview.with_ui('redoc',
