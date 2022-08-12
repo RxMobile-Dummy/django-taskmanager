@@ -18,6 +18,9 @@ class UserStatusModel(models.Model):
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
 
+    def __str__(self):
+        return f"{self.user_status}"
+
 class UserModel(models.Model):
     """Serializer for user model"""
     id = models.AutoField(primary_key=True)
@@ -36,6 +39,9 @@ class UserModel(models.Model):
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
 
+    def __str__(self):
+         return f"{self.first_name} {self.last_name}"
+
 
 class UserRoleModel(models.Model):
     """Serializer for user role"""
@@ -46,6 +52,9 @@ class UserRoleModel(models.Model):
     is_active = models.BooleanField(default=True)
     is_delete = models.BooleanField(default=False)
     objects = models.Manager()
+
+    def __str__(self):
+        return f"{self.user_role}"
 
 class OtpForPasswordModel(models.Model):
     """Serializer for user status"""
