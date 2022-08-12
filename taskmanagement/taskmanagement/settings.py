@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'django_jwt_extended',
+    'checklist'
 ]
 
 MIDDLEWARE = [
