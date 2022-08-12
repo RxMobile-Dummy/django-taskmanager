@@ -10,7 +10,7 @@ class AddTaskSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = TaskModel
         exclude = ["created_at", "updated_at", "is_active",
-                   "is_delete", "isCompleted", "user_id"]
+                   "is_delete", "isCompleted", "user"]
 
 
 class UpdateTaskSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class UpdateTaskSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = TaskModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class DeleteTaskSerializer(serializers.ModelSerializer):

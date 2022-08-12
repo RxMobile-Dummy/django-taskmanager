@@ -9,7 +9,7 @@ class AddNoteSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = NotesModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class UpdateNoteSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class UpdateNoteSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = NotesModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class DeleteNoteSerializer(serializers.ModelSerializer):

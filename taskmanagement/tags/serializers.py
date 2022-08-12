@@ -9,7 +9,7 @@ class AddTagSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = TagModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class UpdateTagSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class UpdateTagSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = TagModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class DeleteTagSerializer(serializers.ModelSerializer):
@@ -40,4 +40,4 @@ class GetTagSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = TagModel
-        fields = ['task_id', 'id']
+        fields = ['task', 'id']

@@ -48,6 +48,7 @@ def add_new_note(request):
             notedata = list(NotesModel.objects.values().filter(id=new_note.id))
             notedata[0].pop("is_active")
             notedata[0].pop("is_delete")
+            notedata[0]['user_id'] = str(notedata[0]['user_id'])
             return Response(
                 ResponseData.success(notedata[0], "Note added successfully"),
                 status=status.HTTP_201_CREATED)
@@ -105,6 +106,7 @@ def update_note(request):
                 notedata = list(NotesModel.objects.values().filter(id=note.id))
                 notedata[0].pop("is_active")
                 notedata[0].pop("is_delete")
+                notedata[0]['user_id'] = str(notedata[0]['user_id'])
                 return Response(
                     ResponseData.success(
                         notedata[0], "Note details updated successfully"),
@@ -201,6 +203,7 @@ def get_note(request):
                     user_id=user_id))
                 notedata[0].pop("is_active")
                 notedata[0].pop("is_delete")
+                notedata[0]['user_id'] = str(notedata[0]['user_id'])
                 return Response(
                     ResponseData.success(
                         notedata, "Note details fetched successfully"),

@@ -10,7 +10,7 @@ class AddProjectSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = ProjectModel
         exclude = ["created_at", "updated_at", "is_active",
-                   "is_delete", "status_id", "user_id"]
+                   "is_delete", "status", "user"]
 
 
 class UpdateProjectSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class UpdateProjectSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = ProjectModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
 
 
 class GetProjectSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class AddProjectAssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = ProjectAssigneeModel
-        exclude = ["user_id", "created_at",
+        exclude = ["user", "created_at",
                    "updated_at", "is_active", "is_delete"]
 
 
@@ -98,7 +98,7 @@ class DeleteProjectAssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = ProjectAssigneeModel
-        exclude = ["user_id", "created_at",
+        exclude = ["user", "created_at",
                    "updated_at", "is_active", "is_delete"]
 
 
@@ -107,7 +107,7 @@ class GetProjectAssigneeSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = ProjectAssigneeModel
-        exclude = ["user_id", "assignee_ids", "created_at",
+        exclude = ["user", "assignee_ids", "created_at",
                    "updated_at", "is_active", "is_delete"]
 
 
@@ -117,4 +117,4 @@ class InviteProjectAssigneeSerializer(serializers.ModelSerializer):
         """Meta class to change behaviour of model fields"""
         model = ProjectAssigneeModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete", "user_id"]
+                   "is_active", "is_delete", "user"]
