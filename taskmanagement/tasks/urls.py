@@ -14,4 +14,10 @@ urlpatterns = [
          name="update_task_status"),
     path('delete_task_status/', views.delete_task_status,
          name="delete_task_status"),
+    path('add_task_priority/', views.add_task_priority, name="add_task_priority"),
+    path('get_task_priority/', views.get_task_priority, name="get_task_priority"),
+    path('update_task_priority/', views.update_task_priority,
+         name="update_task_priority"),
+    path('delete_task_priority/', views.delete_task_priority,
+         name="delete_task_priority"),
 ]

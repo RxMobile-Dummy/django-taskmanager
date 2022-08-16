@@ -1,7 +1,9 @@
 """Serializer for usermodel"""
 
 from datetime import datetime
+from django import forms
 from django.db import models
+from django.forms import ModelForm
 from phonenumber_field.modelfields import PhoneNumberField
 import django
 
@@ -44,7 +46,7 @@ class UserModel(models.Model):
     profile_pic = models.FileField(blank=True)
     email = models.EmailField()
     mobile_number = PhoneNumberField()
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=20,null=True)
     role = models.ForeignKey(UserRoleModel, on_delete=models.CASCADE,null=True)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
     updated_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)

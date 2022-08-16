@@ -1,7 +1,6 @@
 """Module for task serializer"""
-from email.policy import default
 from rest_framework import serializers
-from tasks.models import TaskModel, TaskStatusModel
+from tasks.models import TaskModel, TaskStatusModel , TaskPriorityModel
 
 
 class AddTaskSerializer(serializers.ModelSerializer):
@@ -81,5 +80,45 @@ class DeleteTaskStatusSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = TaskStatusModel
+        exclude = ["isCompleted", "created_at",
+                   "updated_at", "is_active", "is_delete"]
+
+
+class AddTaskPrioritySerializer(serializers.ModelSerializer):
+    """Serializer for adding task status"""
+    class Meta:
+        """Meta class to change behaviour of model fields"""
+        model = TaskPriorityModel
+        exclude = ["created_at", "updated_at", "is_active", "is_delete"]
+
+
+class GetTaskPrioritySerializer(serializers.ModelSerializer):
+    """Serializer for getting task status"""
+    id = serializers.IntegerField(default=None)
+
+    class Meta:
+        """Meta class to change behaviour of model fields"""
+        model = TaskPriorityModel
+        exclude = ["isCompleted", "created_at",
+                   "updated_at", "is_active", "is_delete"]
+
+
+class UpdateTaskPrioritySerializer(serializers.ModelSerializer):
+    """Serializer for updating task status"""
+    id = serializers.IntegerField()
+
+    class Meta:
+        """Meta class to change behaviour of model fields"""
+        model = TaskPriorityModel
+        exclude = ["created_at", "updated_at", "is_active", "is_delete"]
+
+
+class DeleteTaskPrioritySerializer(serializers.ModelSerializer):
+    """Serializer for deleting task status"""
+    id = serializers.IntegerField()
+
+    class Meta:
+        """Meta class to change behaviour of model fields"""
+        model = TaskPriorityModel
         exclude = ["isCompleted", "created_at",
                    "updated_at", "is_active", "is_delete"]

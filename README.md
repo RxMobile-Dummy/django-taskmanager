@@ -1,6 +1,10 @@
 # Task Management
 - Created task management system using django framework in python which helps company to manage there projects.
 
+### Admin panel
+<img src="https://github.com/RxMobile-Dummy/django-taskmanager/blob/main/media/admin-panel.gif" />
+
+
 #### Features
 
 - ##### User Authorization
