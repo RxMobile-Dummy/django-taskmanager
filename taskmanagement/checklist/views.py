@@ -2,6 +2,7 @@
 
 from multiprocessing import AuthenticationError
 from multiprocessing.dummy import Array
+from tkinter.tix import CheckList
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -97,69 +98,83 @@ def add_new_checklist(request):
         )
 
 
-# @swagger_auto_schema(method="POST", request_body=UpdateChecklistSerializer)
-# @api_view(["POST"])
-# def update_checklist(request):
-#     """Function to update an existing checklist"""
-#     try:
-#         authenticated_user = Authentication().authenticate(request)
-#         data = request.data
-#         serializer = UpdateChecklistSerializer(data=data)
-#         if serializer.is_valid():
-#             user_id = authenticated_user[0].id
-#             checklist_id = serializer.initial_data["id"]
-#             checklist_detail_id = serializer.initial_data["id"]
-#             description = serializer.data["description"]
-#             files = request.FILES.getlist("files")
-#             user = UserModel.objects.filter(id=user_id).first()
-#             if not user:
-#                 return Response(
-#                     ResponseData.error("User does not exists"),
-#                     status=status.HTTP_200_OK,
-#                 )
-#             comment = CommentModel.objects.filter(id=comment_id).first()
-#             if not comment:
-#                 return Response(
-#                     ResponseData.error("Comment does not exists"),
-#                     status=status.HTTP_200_OK,
-#                 )
-#             comment_data = CommentModel.objects.filter(id=comment_id).first()
-#             if not comment_data:
-#                 return Response(
-#                     ResponseData.error(
-#                         "Comment id does not exists or is invalid"),
-#                     status=status.HTTP_200_OK,
-#                 )
-#             else:
-#                 files_path = []
-#                 if(len(files) > 0):
-#                     for f in files:
-#                        fs = FileSystemStorage(location='static/')
-#                        files_path.append(f"static/{f.name}")
-#                        fs.save(f, f)
-#                     comment_data.files = files_path
-#                 comment_data.description = description
-#                 comment_data.save()
-#                 comments = list(
-#                     CommentModel.objects.values().filter(id=comment_data.id))
-#                 comments[0].pop("is_active")
-#                 comments[0].pop("is_delete")
-#                 comments[0]['user_id'] = str(comments[0]['user_id'])
-#                 comments[0]['comment_user_id'] = str(comments[0]['comment_user_id'])                
-#                 return Response(
-#                     ResponseData.success(
-#                         comments[0], "Comment updated successfully"),
-#                     status=status.HTTP_201_CREATED,
-#                 )
-#         return Response(
-#             ResponseData.error(serializer.errors),
-#             status=status.HTTP_400_BAD_REQUEST,
-#         )
-#     except Exception as exception:
-#         return Response(
-#             ResponseData.error(str(exception)),
-#             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#         )
+@swagger_auto_schema(method="POST", request_body=UpdateChecklistSerializer)
+@api_view(["POST"])
+def update_checklist(request):
+    """Function to update an existing checklist"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = UpdateChecklistSerializer(data=data)
+        if serializer.is_valid():
+            user_id = authenticated_user[0].id
+            checklist_option_id = serializer.initial_data["id"]
+            is_completed = serializer.initial_data["is_completed"]
+            title = serializer.data["title"] if serializer.data["title"] is not None else ""
+            color = serializer.data["color"] if serializer.data["color"] is not None else ""
+            checklist_details = ChecklistDetailModel.objects.filter(id=checklist_option_id).first()
+            user = UserModel.objects.filter(id=user_id).first()
+            if not user:
+                return Response(
+                    ResponseData.error("User does not exists"),
+                    status=status.HTTP_200_OK,
+                )
+            checklistcopy = ChecklistModel.objects.filter(id=checklist_details.checklist_id).first()
+            if not checklistcopy:
+                return Response(
+                    ResponseData.error("Checklist does not exists"),
+                    status=status.HTTP_200_OK,
+                )
+            elif not checklist_details:
+                return Response(
+                    ResponseData.error("Checklist details does not exists"),
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                if title != "":
+                   checklistcopy.title = title
+                if color != "":
+                   checklistcopy.color = color
+                checklistcopy.save()
+                if is_completed == "true" or  is_completed == "True": 
+                    is_completed = True
+                else:
+                    is_completed = False
+                checklist_details.is_completed =  is_completed
+                checklist_details.save()
+                checklist = list(
+                ChecklistModel.objects.values().filter(user_id = user_id,id=checklistcopy.id),
+                )
+                checklistdetails = list(
+                ChecklistDetailModel.objects.values().filter(checklist_id = checklistcopy.id,user_id = user_id),
+                )
+                checklist[0]["options_details"] = checklistdetails
+                checklist[0].pop("is_active")
+                checklist[0].pop("is_delete")
+                checklist[0].pop("created_at")
+                checklist[0].pop("updated_at")
+                checklist[0]['user_id'] = str(checklist[0]['user_id'])
+                for i in range(0,len(checklist[0]["options_details"])):
+                    checklist[0]["options_details"][i].pop("created_at")
+                    checklist[0]["options_details"][i].pop("updated_at")
+                    checklist[0]["options_details"][i].pop("is_active")
+                    checklist[0]["options_details"][i].pop("is_delete")
+                    checklist[0]["options_details"][i]['user_id'] = str(checklist[0]["options_details"][i]['user_id'])
+                    checklist[0]["options_details"][i]['checklist_id'] = str(checklist[0]["options_details"][i]['checklist_id'])
+                return Response(
+                    ResponseData.success(
+                        checklist, "Checklist details updated successfully"),
+                    status=status.HTTP_201_CREATED,
+                )
+        return Response(
+            ResponseData.error(serializer.errors),
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as exception:
+        return Response(
+            ResponseData.error(str(exception)),
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 @swagger_auto_schema(method="POST", request_body=DeleteChecklistSerializer)

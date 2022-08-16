@@ -851,14 +851,16 @@ def refresh_token(request):
         data = request.data
         serializer = RefreshAuthTokenSerializer(data=data)
         if authenticated_user is not None:
+            print(f"dsvdsdsvs {authenticated_user[0].id}")
             userdata = UserModel.objects.filter(
                 id=authenticated_user[0].id
             ).first()
             user_details = list(
                 UserModel.objects.values().filter(id=authenticated_user[0].id))
+            print(f"dsvdsfs {user_details}")
             user_details[0].pop("is_active")
             user_details[0].pop("is_delete")
-            user_details[0].pop("user_id")
+            # user_details[0].pop("user_id")
             user_details[0].pop("password")
             user_details[0].pop("first_name")
             user_details[0].pop("last_name")

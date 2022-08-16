@@ -22,18 +22,20 @@ class AddChecklistSerializer(serializers.ModelSerializer):
 class UpdateChecklistSerializer(serializers.ModelSerializer):
     """Serializers for updating checklist"""
     id = serializers.IntegerField()
+    title = serializers.CharField(default=None)
+    color = serializers.CharField(default=None)
 
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = ChecklistModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete"]
+                   "is_active", "is_delete","user"]
 
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = ChecklistDetailModel
         exclude = ["created_at", "updated_at",
-                   "is_active", "is_delete"]
+                   "is_active", "is_delete","user","checklist"]
 
 
 class DeleteChecklistSerializer(serializers.ModelSerializer):
