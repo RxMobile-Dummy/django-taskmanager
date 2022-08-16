@@ -13,7 +13,7 @@ from user_auth.models import UserModel
 class ChecklistModel(models.Model):
     """Model for comments module."""
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True)
     title = models.CharField(max_length=300, default="", blank=True)
     color = models.CharField(max_length=300, default="", blank=True)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
@@ -27,10 +27,9 @@ class ChecklistModel(models.Model):
 
 class ChecklistDetailModel(models.Model):
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    checklist = models.ForeignKey(ChecklistModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True)
+    checklist = models.ForeignKey(ChecklistModel, on_delete=models.CASCADE,null=True)
     checklist_detail = models.CharField(default="", blank=True,max_length=200)
-    is_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
     updated_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
     is_active = models.BooleanField(default=True)

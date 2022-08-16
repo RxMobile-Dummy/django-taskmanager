@@ -76,7 +76,7 @@ def signup(request):
                 email=email_id,
                 mobile_number=mobile_number,
                 password=password,
-                role=role,
+                role_id=role,
                 status_id=user_status_id,
             )
             new_user.save()
@@ -89,6 +89,7 @@ def signup(request):
             user_details[0]["authentication_token"] = serializer.get_token(
                 user_details[0])
             user_details[0]['status_id'] = str(user_details[0]['status_id'])
+            user_details[0]['role_id'] = str(user_details[0]['role_id'])
             return Response(
                 ResponseData.success(
                     user_details[0], "User created successfully"),
@@ -133,7 +134,7 @@ def signin(request):
             userdata[0]["status_id"] = str(userdata[0]["status_id"])
             userdata[0]["authentication_token"] = serializer.get_token(
                 userdata[0])
-            userdata[0]['status_id'] = str(userdata[0]['status_id'])
+            userdata[0]['role_id'] = str(userdata[0]['role_id'])
             return JsonResponse(
                     ResponseData.success(
                         userdata[0], "User logged in successfully"),
@@ -353,14 +354,14 @@ def update_profile(request):
                userdata.first_name=first_name
                userdata.profile_pic = f"static/{request.FILES['profile_pic']}"
                userdata.last_name=last_name
-               userdata.role = serializer.data["role"]
+               userdata.role_id = serializer.data["role"]
                userdata.status_id = status_id
                userdata.save()
                print("true")
             else:
                userdata.first_name=first_name
                userdata.last_name=last_name
-               userdata.role = serializer.data["role"]
+               userdata.role_id = serializer.data["role"]
                userdata.status_id = status_id
                userdata.save()
                print("true")
@@ -372,6 +373,7 @@ def update_profile(request):
             updated_date[0].pop("is_active")
             updated_date[0].pop("is_delete")
             updated_date[0]['status_id'] = str(updated_date[0]['status_id'])
+            updated_date[0]['role_id'] = str(updated_date[0]['role_id'])
             return Response(
                 ResponseData.success(
                     updated_date[0], "User profile updated successfully"),

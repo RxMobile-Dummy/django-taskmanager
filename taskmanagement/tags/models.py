@@ -12,8 +12,8 @@ from user_auth.models import UserModel
 class TagModel(models.Model):
     """Class for tag model"""
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    task = models.ForeignKey(TaskModel, on_delete=models.CASCADE,related_name='task_id')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True)
+    task = models.ForeignKey(TaskModel, on_delete=models.CASCADE,null=True,related_name='task_id')
     name = models.CharField(max_length=50)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
     updated_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)

@@ -1,15 +1,10 @@
 """Comment module"""
-
-from multiprocessing import AuthenticationError
 from multiprocessing.dummy import Array
-from tkinter.tix import CheckList
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from projects.models import ProjectModel
 from checklist.models import ChecklistDetailModel
-from tasks.models import TaskModel
 from user_auth.models import UserModel
 from user_auth.authentication import Authentication
 from response import Response as ResponseData
@@ -18,7 +13,6 @@ from checklist.serializers import AddChecklistSerializer
 from checklist.serializers import DeleteChecklistSerializer
 from checklist.serializers import GetChecklistSerializer, UpdateChecklistSerializer
 from django.forms.models import model_to_dict
-from django.core.files.storage import FileSystemStorage
 # Create your views here.
 
 
