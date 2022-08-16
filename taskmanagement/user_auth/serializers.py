@@ -174,7 +174,7 @@ class RefreshAuthTokenSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class to change behaviour of model fields"""
         model = UserModel
-        fields = ['mobile_number','email']
+        fields = []
 
     @staticmethod
     def get_token(user):
