@@ -9,6 +9,19 @@ from user_auth.models import UserModel
 
 # Create your models here.
 
+class TaskPriorityModel(models.Model):
+    """Model for task priority"""
+    id = models.AutoField(primary_key=True)
+    task_priority = models.CharField(max_length=40)
+    created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
+    updated_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
+    is_active = models.BooleanField(default=True)
+    is_delete = models.BooleanField(default=False)
+    objects = models.Manager()
+
+    def __str__(self):
+        return f"{self.task_priority}"
+
 testeddate = '23/04/2015'
 class TaskModel(models.Model):
     """Class for Task model"""
@@ -19,7 +32,7 @@ class TaskModel(models.Model):
     comment = models.CharField(max_length=50, blank=True, default="")
     description = models.CharField(max_length=300, default="", blank=True)
     isCompleted = models.BooleanField(max_length=200, blank=True, default=False,null=True)
-    priority = models.CharField(max_length=200)
+    priority = models.ForeignKey(TaskPriorityModel, on_delete=models.CASCADE,null=True)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
     updated_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
     is_active = models.BooleanField(default=True)

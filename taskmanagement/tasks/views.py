@@ -6,6 +6,10 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from response import Response as ResponseData
 from projects.models import ProjectModel
+from tasks.serializers import DeleteTaskPrioritySerializer
+from tasks.serializers import UpdateTaskPrioritySerializer
+from tasks.models import TaskPriorityModel
+from tasks.serializers import AddTaskPrioritySerializer, GetTaskPrioritySerializer
 # from taskmanagement.tasks import serializers
 from tasks.models import TaskModel, TaskStatusModel
 from tasks.serializers import AddTaskSerializer, DeleteTaskSerializer
@@ -34,8 +38,6 @@ def add_new_task(request):
         data["end_date"] = end_date
         serializer = AddTaskSerializer(data=data)
         if serializer.is_valid():
-            print('serializer.data["reviewer"]')
-            print(serializer.data["reviewer"])
             user_id = authenticated_user[0].id
             project_id = serializer.data["project"]
             name = serializer.data["name"]
@@ -52,6 +54,10 @@ def add_new_task(request):
             if not user:
                 return Response(
                     ResponseData.error("User does not exists"),
+                    status=status.HTTP_200_OK)
+            if not priority:
+                return Response(
+                    ResponseData.error("Task priority id does not exists"),
                     status=status.HTTP_200_OK)
             if project_id != "":
                 project = ProjectModel.objects.filter(id=project_id).first()
@@ -85,7 +91,7 @@ def add_new_task(request):
                     status=status.HTTP_200_OK)
             new_task = TaskModel.objects.create(user_id=user_id, project_id=project_id,
             name=name, comment=comment, isCompleted=False,
-            description=description, is_private=is_private, priority=priority,
+            description=description, is_private=is_private, priority_id=priority,
             reviewer_id=reviewer_id, assignee_id=assignee_id,
             tag_id=tag_id, start_date=start_date, end_date=end_date,)
             new_task.save()
@@ -100,6 +106,7 @@ def add_new_task(request):
             task_data[0]['project_id'] = str(task_data[0]['project_id'])
             task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id'])
             task_data[0]['assignee_id'] = str(task_data[0]['assignee_id'])
+            task_data[0]['priority_id'] = str(task_data[0]['priority_id'])
             return Response(
                 ResponseData.success(task_data[0], "Task added successfully"),
                 status=status.HTTP_201_CREATED)
@@ -143,6 +150,10 @@ def update_task(request):
                 return Response(
                     ResponseData.error("User does not exists"),
                     status=status.HTTP_200_OK)
+            if not priority:
+                return Response(
+                    ResponseData.error("Task priority id does not exists"),
+                    status=status.HTTP_200_OK)
             if project_id != "":
                 project_data = ProjectModel.objects.filter(
                     id=project_id).first()
@@ -182,7 +193,7 @@ def update_task(request):
             task.description = description
             task.is_private = is_private
             task.project_id = project_id
-            task.priority = priority
+            task.priority_id = priority
             task.tag_id = tag_id
             task.reviewer_id = reviewer_id
             task.assignee_id = assignee_id
@@ -200,6 +211,7 @@ def update_task(request):
             task_data[0]['project_id'] = str(task_data[0]['project_id'])
             task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id'])
             task_data[0]['assignee_id'] = str(task_data[0]['assignee_id'])
+            task_data[0]['priority_id'] = str(task_data[0]['priority_id'])
             return Response(
                 ResponseData.success(
                     task_data[0], "Task details updated successfully"),
@@ -280,6 +292,7 @@ def get_task(request):
                     task_data[0]['project_id'] = str(task_data[0]['project_id'])
                     task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
                     task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
+                    task_data[0]['priority_id'] = str(task_data[0]['priority_id']) if task_data[0]['priority_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -296,6 +309,7 @@ def get_task(request):
                     task_data[i]['project_id'] = str(task_data[i]['project_id'])
                     task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
                     task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
+                    task_data[i]['priority_id'] = str(task_data[i]['priority_id']) if task_data[i]['priority_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -319,6 +333,7 @@ def get_task(request):
                     task_data[0]['project_id'] = str(task_data[0]['project_id'])
                     task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
                     task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
+                    task_data[0]['priority_id'] = str(task_data[0]['priority_id']) if task_data[0]['priority_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -335,6 +350,7 @@ def get_task(request):
                     task_data[i]['project_id'] = str(task_data[i]['project_id'])
                     task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
                     task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
+                    task_data[i]['priority_id'] = str(task_data[i]['priority_id']) if task_data[i]['priority_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -356,6 +372,7 @@ def get_task(request):
                     task_data[0]["end_date"] = end_date
                     task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
                     task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
+                    task_data[0]['priority_id'] = str(task_data[0]['priority_id']) if task_data[0]['priority_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -372,6 +389,7 @@ def get_task(request):
                     task_data[i]['project_id'] = str(task_data[i]['project_id'])
                     task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
                     task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
+                    task_data[i]['priority_id'] = str(task_data[i]['priority_id']) if task_data[i]['priority_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -395,6 +413,7 @@ def get_task(request):
                     task_data[0]['project_id'] = str(task_data[0]['project_id'])
                     task_data[0]['reviewer_id'] = str(task_data[0]['reviewer_id']) if task_data[0]['reviewer_id'] is not None else "" 
                     task_data[0]['assignee_id'] = str(task_data[0]['assignee_id']) if task_data[0]['assignee_id'] is not None else "" 
+                    task_data[0]['priority_id'] = str(task_data[0]['priority_id']) if task_data[0]['priority_id'] is not None else "" 
                     return Response(
                         ResponseData.success(
                             task_data, "Task details fetched successfully"),
@@ -411,6 +430,7 @@ def get_task(request):
                     task_data[i]['project_id'] = str(task_data[i]['project_id'])
                     task_data[i]['reviewer_id'] = str(task_data[i]['reviewer_id']) if task_data[i]['reviewer_id'] is not None else "" 
                     task_data[i]['assignee_id'] = str(task_data[i]['assignee_id']) if task_data[i]['assignee_id'] is not None else "" 
+                    task_data[i]['priority_id'] = str(task_data[i]['priority_id']) if task_data[i]['priority_id'] is not None else "" 
                 return Response(
                     ResponseData.success(
                         task_data, "Task details fetched successfully"),
@@ -572,6 +592,161 @@ def delete_task_status(request):
             return Response(
                 ResponseData.success_without_data(
                     "Task status deleted successfully"),
+                status=status.HTTP_200_OK)
+        return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exception:
+        return Response(ResponseData.error(str(exception)),
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@ swagger_auto_schema(method='POST', request_body=AddTaskPrioritySerializer)
+@ api_view(["POST"])
+def add_task_priority(request):
+    """Function to add task priority"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = AddTaskPrioritySerializer(data=data)
+        if serializer.is_valid():
+            task_priority = serializer.data["task_priority"]
+            priority_data = TaskPriorityModel.objects.filter(
+                task_priority=task_priority).first()
+            if priority_data:
+                return Response(
+                    ResponseData.error("Task priority already exists"),
+                    status=status.HTTP_200_OK)
+            new_task_priority = TaskPriorityModel.objects.create(
+                task_priority=task_priority)
+            new_task_priority.save()
+            task_priority_data = list(
+                TaskPriorityModel.objects.values().filter(id=new_task_priority.id))
+            task_priority_data[0].pop("is_active")
+            task_priority_data[0].pop("is_delete")
+            return Response(
+                ResponseData.success(
+                    task_priority_data[0], "Task priority added successfully"),
+                status=status.HTTP_201_CREATED)
+        return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exception:
+        return Response(ResponseData.error(str(exception)),
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@swagger_auto_schema(method='POST', request_body=GetTaskPrioritySerializer)
+@api_view(["POST"])
+def get_task_priority(request):
+    """Function to get task priority"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = GetTaskPrioritySerializer(data=data)
+        if serializer.is_valid():
+            
+            task_priority_id = serializer.data["id"]
+            if task_priority_id is None:
+                task_priority_data = list(TaskPriorityModel.objects.values())
+                if len(task_priority_data) == 0:
+                    return Response(
+                        ResponseData.success(
+                            task_priority_data, "No task priority found"),
+                        status=status.HTTP_201_CREATED)
+                if len(task_priority_data) == 1:
+                    task_priority_data[0].pop("is_active")
+                    task_priority_data[0].pop("is_delete")
+                    return Response(
+                        ResponseData.success(
+                            task_priority_data[0], "Task priority details fetched successfully"),
+                        status=status.HTTP_201_CREATED)
+                for i,ele in enumerate(task_priority_data):
+                    ele.pop("is_active")
+                    ele.pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        task_priority_data, "Task priority details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+            task_priority_data = TaskPriorityModel.objects.filter(
+                id=task_priority_id).first()
+            if not task_priority_data:
+                return Response(
+                    ResponseData.error(
+                        "Task priority id does not exists or is invalid"),
+                    status=status.HTTP_200_OK)
+            else:
+                task_priority_data = list(
+                    TaskPriorityModel.objects.values().filter(id=task_priority_id))
+                task_priority_data[0].pop("is_active")
+                task_priority_data[0].pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        task_priority_data[0], "Task priority details fetched successfully"),
+                    status=status.HTTP_201_CREATED)
+        return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exception:
+        return Response(ResponseData.error(str(exception)),
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@swagger_auto_schema(method='POST', request_body=UpdateTaskPrioritySerializer)
+@api_view(["POST"])
+def update_task_priority(request):
+    """Function to update task priority"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = UpdateTaskPrioritySerializer(data=data)
+        if serializer.is_valid():
+            task_priority_id = serializer.data["id"]
+            task_priority = serializer.data["task_status"]
+            if task_priority_id != "":
+                task_priority_data = TaskPriorityModel.objects.filter(
+                    id=task_priority_id).first()
+                if not task_priority_data:
+                    return Response(
+                        ResponseData.error(
+                            "Task priority id does not exists or is invalid"),
+                        status=status.HTTP_200_OK)
+                if task_priority_data.task_priority == task_priority:
+                    return Response(
+                        ResponseData.error(
+                            f"The task priority with this name {task_priority} already exists"),
+                        status=status.HTTP_200_OK)
+                task_priority_data.task_priority = task_priority
+                task_priority_data.save()
+                task_priority_data = list(
+                    TaskPriorityModel.objects.values().filter(id=task_priority_data.id))
+                task_priority_data[0].pop("is_active")
+                task_priority_data[0].pop("is_delete")
+                return Response(
+                    ResponseData.success(
+                        task_priority_data[0], "Task priority updated successfully"),
+                    status=status.HTTP_201_CREATED)
+            else:
+                return Response(
+                    ResponseData.error("Task status id param cannot be empty"),
+                    status=status.HTTP_200_OK)
+        return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
+    except Exception as exception:
+        return Response(ResponseData.error(str(exception)),
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@swagger_auto_schema(method='POST', request_body=DeleteTaskPrioritySerializer)
+@api_view(["POST"])
+def delete_task_priority(request):
+    """Function to delete task priority"""
+    try:
+        authenticated_user = Authentication().authenticate(request)
+        data = request.data
+        serializer = DeleteTaskPrioritySerializer(data=data)
+        if serializer.is_valid():
+            task_priority_id = serializer.data["id"]
+            if not TaskPriorityModel.objects.filter(id=task_priority_id).first():
+                return Response(
+                    ResponseData.error("Task priority id does not exists"),
+                    status=status.HTTP_201_CREATED)
+            TaskPriorityModel.objects.filter(id=task_priority_id).delete()
+            return Response(
+                ResponseData.success_without_data(
+                    "Task priority deleted successfully"),
                 status=status.HTTP_200_OK)
         return Response(ResponseData.error(serializer.errors), status=status.HTTP_400_BAD_REQUEST)
     except Exception as exception:

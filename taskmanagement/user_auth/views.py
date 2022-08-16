@@ -52,6 +52,16 @@ def signup(request):
                     ResponseData.error("Role id is not valid"),
                     status=status.HTTP_200_OK,
                 )
+            if UserModel.objects.filter(first_name=first_name).first():
+                return Response(
+                    ResponseData.error("first name already exists"),
+                    status=status.HTTP_200_OK,
+                )
+            if UserModel.objects.filter(last_name=last_name).first():
+                return Response(
+                    ResponseData.error("last name already exists"),
+                    status=status.HTTP_200_OK,
+                )
             if email:
                 return Response(
                     ResponseData.error("Email already exists"),
@@ -599,7 +609,6 @@ def add_user_role(request):
         data = request.data
         serializer = AddUserRoleSerializer(data=data)
         if serializer.is_valid():
-            
             user_role = serializer.data["user_role"]
             role_data = UserRoleModel.objects.filter(
                 user_role=user_role).first()
@@ -870,7 +879,7 @@ def refresh_token(request):
             user_details[0].pop("profile_pic")
             user_details[0].pop("email")
             user_details[0].pop("mobile_number")
-            user_details[0].pop("role")
+            user_details[0].pop("role_id")
             user_details[0].pop("created_at")
             user_details[0].pop("updated_at")
             user_details[0].pop("id")

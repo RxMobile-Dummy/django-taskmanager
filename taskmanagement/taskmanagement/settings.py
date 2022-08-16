@@ -182,7 +182,7 @@ REST_FRAMEWORK = {
                   }
 
 # JWT settings
-JWT_TOKEN_EXPIRY = 7   # No. of days
+JWT_TOKEN_EXPIRY = 1   # No. of days
 JWT_ALGORITHM = 'HS256'  # Algorithm specified by JWT
 JWT_UTF = 'utf-8'
 
