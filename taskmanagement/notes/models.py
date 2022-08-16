@@ -9,7 +9,7 @@ from user_auth.models import UserModel
 # Create your models here.
 class NotesModel(models.Model):
     """Class for Note model"""
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True)
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=300, default="", blank=True)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)

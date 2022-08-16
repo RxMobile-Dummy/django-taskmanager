@@ -13,8 +13,8 @@ testeddate = '23/04/2015'
 class TaskModel(models.Model):
     """Class for Task model"""
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    project = models.ForeignKey(ProjectModel, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True)
+    project = models.ForeignKey(ProjectModel, on_delete=models.CASCADE,null=True)
     name = models.CharField(max_length=50)
     comment = models.CharField(max_length=50, blank=True, default="")
     description = models.CharField(max_length=300, default="", blank=True)

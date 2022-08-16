@@ -13,8 +13,8 @@ from user_auth.models import UserModel
 class CommentModel(models.Model):
     """Model for comments module."""
     id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
-    comment_user = models.ForeignKey(UserModel, on_delete=models.CASCADE,related_name='comment_user')
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True)
+    comment_user = models.ForeignKey(UserModel, on_delete=models.CASCADE,null=True,related_name='comment_user')
     # task_id = models.CharField(max_length=50,blank=True)
     description = models.CharField(max_length=300, default="", blank=True)
     created_at = models.DateTimeField(default=django.utils.timezone.now, blank=True)
