@@ -11,13 +11,16 @@ class UserForm(forms.ModelForm):
 
 @admin.register(UserModel)
 class UserModelAdmin(admin.ModelAdmin):
+    exclude = ("created_at","updated_at","is_active","is_delete")
     form = UserForm
     pass
 
 @admin.register(UserRoleModel)
 class UserRoleModelAdmin(admin.ModelAdmin):
+    exclude = ("created_at","updated_at","is_active","is_delete")
     pass
 
 @admin.register(UserStatusModel)
 class UserStatusModelAdmin(admin.ModelAdmin):
+    exclude = ("created_at","updated_at","is_active","is_delete")
     pass
