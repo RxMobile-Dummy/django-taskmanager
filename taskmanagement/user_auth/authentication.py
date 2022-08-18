@@ -33,5 +33,9 @@ class Authentication(authentication.BaseAuthentication):
                     raise exceptions.AuthenticationFailed(
                         'No such user exists')
                 return user, None
-            raise exceptions.AuthenticationFailed(message)
+            if message == "Token is Invalid":
+                returndata = {"success": False, "error": message}
+                raise exceptions.PermissionDenied(returndata)
+            returndata = {"success": False, "error": message}
+            raise exceptions.AuthenticationFailed(returndata)
         raise exceptions.AuthenticationFailed('No token provided')
