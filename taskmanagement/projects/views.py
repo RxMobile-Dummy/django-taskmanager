@@ -43,8 +43,8 @@ def index(request,project_id, assignee_id):
 @api_view(["POST"])
 def add_new_project(request):
     """Function to add new project"""
+    authenticated_user = Authentication().authenticate(request)
     try:
-        authenticated_user = Authentication().authenticate(request)
         data = request.data
         serializer = AddProjectSerializer(data=data)
         if serializer.is_valid():
